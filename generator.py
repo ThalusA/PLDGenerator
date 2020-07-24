@@ -16,7 +16,7 @@ def generate_style() -> str:
     return final_str
 
 def generate_dependencies() -> str:
-    final_str = add_document_class()
+    final_str = add_document_class("extarticle", "12pt")
     dependencies = [
         ("svg", None),
         ("amsmath", None),
@@ -34,7 +34,8 @@ def generate_dependencies() -> str:
         ("needspace", None),
         ("tocbibind", None),
         ("xcolor", None),
-        ("forest", "linguistics")
+        ("forest", "linguistics"),
+        ("adjustbox", None)
     ]
     for name, opt in dependencies:
         final_str += add_package(name, opt)
@@ -52,15 +53,15 @@ def generate_first_page(subtitle: str = "") -> str:
 
 def generate_document_description(doc_desc: object, last_version_desc: object, local: str = "fr_FR.UTF-8") -> str:
     return add_chunk(add_depth_title("Description du document") + add_arraystreching(1.4) + add_tabularx("|l|X|", [
-        [add_cell_color("gray", 0.9, "Titre"), doc_desc.get("title")],
-        [add_cell_color("gray", 0.9, "Description"), doc_desc.get("description")],
-        [add_cell_color("gray", 0.9, "Auteur"), ", ".join(doc_desc.get("authors"))],
-        [add_cell_color("gray", 0.9, "Date de mise à jour"), last_version_desc.get("date")],
-        [add_cell_color("gray", 0.9, "Version du modèle"), last_version_desc.get("version")]
+        [add_cell_color("gray", 0.95, "Titre"), doc_desc.get("title")],
+        [add_cell_color("gray", 0.95, "Description"), doc_desc.get("description")],
+        [add_cell_color("gray", 0.95, "Auteur"), ", ".join(doc_desc.get("authors"))],
+        [add_cell_color("gray", 0.95, "Date de mise à jour"), last_version_desc.get("date")],
+        [add_cell_color("gray", 0.95, "Version du modèle"), last_version_desc.get("version")]
     ]))
 
 def generate_document_versions_table(versions: list) -> str:
-    content_list = [[add_cell_color("gray", 0.9, "Date", "row"), "Version", "Auteur", "Sections", "Commentaire"]]
+    content_list = [[add_cell_color("gray", 0.95, "Date", "row"), "Version", "Auteur", "Sections", "Commentaire"]]
     for version in versions:
         content_list.append([version["date"], version["version"], ', '.join(version["author"]), version["sections"], version["comment"]])
     return add_chunk(add_depth_title("Tableau des révisions") + add_arraystreching(1.4) + add_tabularx("|l|l|X|X|X|", content_list))
@@ -99,7 +100,7 @@ def generate_delivrables(delivrables: list) -> str:
             if data_len > max_length: max_length = data_len
             subarrays.append(data)
         subarrays = list(map(lambda x: np.pad(x, (0, max_length - len(x)), 'constant', constant_values='').tolist(), subarrays))
-        contents.append([[add_multicolumn(length, '|c|', add_cell_color("gray", 0.9, delivrable.get("name")))]] + np.transpose(subarrays).tolist())
+        contents.append([[add_multicolumn(length, '|c|', add_cell_color("gray", 0.95, delivrable.get("name")))]] + np.transpose(subarrays).tolist())
     for i in range(len(contents)):
         final_str += add_chunk(add_depth_title(delivrables[i].get("name"), 1) + add_arraystreching(1.4) + add_tabularx(options[i], contents[i]), 'subsection')
     return final_str
@@ -110,9 +111,9 @@ def generate_user_story(userStory: object) -> str:
         [add_multicolumn(2, "|>{\\columncolor[gray]{0.9}\\centering}m{\\rowWidth}|", add_style("bold", userStory.get("name"), newline=False))],
         [add_cell_color("gray", 0.95, "En tant que :", "row"), "Je veux :"],
         [userStory.get("user"), userStory.get("action")],
-        [add_multicolumn(2, "|>{\\columncolor[gray]{0.9}}p{\\rowWidth}|", f"Description :\\\\{userStory.get('description')}")],
+        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Description :\\newline {userStory.get('description')}")],
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Definition of Done : {add_itemization(userStory.get('definitionOfDone'))}")],
-        [add_cell_color("gray", 0.9, "Charge estimée :", "row"), f"{userStory.get('estimatedDuration')} jours-homme ({int(userStory.get('estimatedDuration') * 8)} heures)"], 
+        [add_cell_color("gray", 0.95, "Charge estimée :", "row"), f"{userStory.get('estimatedDuration')} jours-homme ({int(userStory.get('estimatedDuration') * 8)} heures)"], 
     ]))
 
 def generate_recursively_user_stories(data: list, depth: int = 1) -> str:

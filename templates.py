@@ -64,11 +64,11 @@ def add_itemization(content: list = []) -> str:
     return final_str
 
 def add_forest(title: str = "", content: list = [], spacing: str = "15mm") -> str:
-    final_str = f"\\begin{{forest}}\n\tfor tree={{draw, align=center, l={spacing}}},\n\t[{title}\n"
+    final_str = f"\\adjustbox{{max width=\linewidth}}{'{'}\n\\begin{{forest}}\n\tfor tree={{draw, align=center, l={spacing}}},\n\t[{title}\n"
     content = adapt_content(content)
     for index, subtitle in enumerate(content):
         final_str += f"\t\t[{index + 1} {subtitle}]\n"
-    final_str += f"\t]\n\\end{{forest}}"
+    final_str += f"\t]\n\\end{{forest}}{'}'}"
     return final_str
 
 def add_content_centering(content: str = "") -> str:
@@ -141,8 +141,8 @@ def add_wrapper(typename: str = "", content: str = "") -> str:
 def add_new_command(name: str = "", expr: str = "") -> str:
     return f"\\newcommand{{{name}}}{{{expr}}}\n"
 
-def add_document_class(document_type: str = "article") -> str:
-    return f"\\documentclass{{{document_type}}}\n"
+def add_document_class(document_type: str = "article", document_options: str = "") -> str:
+    return f"\\documentclass{{{document_type}}}\n" if document_options == "" else f"\\documentclass[{document_options}]{{{document_type}}}\n"
 
 def add_tikz_library(library_type: str = "fit") -> str:
     return f"\\usetikzlibrary{{{library_type}}}\n"

@@ -1,0 +1,198 @@
+\documentclass[12pt]{extarticle}
+\usepackage{svg}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{hyperref}
+\usepackage{tgbonum}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{geometry}
+\usepackage{environ,calc,needspace}
+\usepackage{tocbibind}
+\usepackage{xcolor}
+\usepackage[linguistics]{forest}
+\usetikzlibrary{fit}
+
+\raggedbottom
+\newlength\chunktotheight
+\NewEnviron{chunk}[1]{
+    \settototalheight{\chunktotheight}{
+        \begin{minipage}{\textwidth}
+        \BODY
+        \end{minipage}
+    }
+    \ifdim\chunktotheight>\textheight
+    \else
+    \needspace{\chunktotheight}
+    \fi
+    \def\temp{#1}\ifx\temp\empty\else
+        \addtocounter{#1}{-1}
+    \fi
+    \BODY
+}{}
+
+ \geometry{
+    a4paper,
+    total={170mm,257mm},
+    left=20mm,
+    top=20mm,
+ }
+ 
+\setcounter{secnumdepth}{0}
+% Font
+\newcommand{\rowWidth}{\linewidth-(\tabcolsep*2)}
+\renewcommand{\familydefault}{\sfdefault}
+
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhf{}
+\lhead{\includesvg[width = 20pt]{d4data_b.svg}}
+\rhead{\Large Project Log Document}
+\rfoot{Page \thepage \space of \pageref{LastPage}}
+\lfoot{\includesvg[width = 100pt]{epitech-logo.svg}}
+
+\fancypagestyle{plain}{
+    \renewcommand{\headrulewidth}{0pt}
+    \fancyhf{}
+    \rfoot{Page \thepage \space of \pageref{LastPage}}
+    \lfoot{\includesvg[width = 100pt]{epitech-logo.svg}}
+}
+
+\renewcommand*\contentsname{Table des matières}
+
+\title{D4DATA PLD - Project Log Document}
+\date{}
+\author{}
+
+\begin{document}
+
+\clearpage
+\vspace*{\fill}
+\begin{center}
+\begin{figure}[htbp]
+    \centering
+    \includesvg{d4data_b.svg}
+    \item\maketitle
+\end{figure}
+\vspace{4cm}
+\textbf{\Large Promotion 2022}
+\end{center}
+\vfill
+\clearpage
+
+\begin{chunk}{}
+    \section{Description du document}
+    % Variable for the array vertical spacing
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline \cellcolor[gray]{0.95}Titre & PLD \\
+        \hline \cellcolor[gray]{0.95}Description & Document décrivant l'évolution du projet D4Data \\
+        \hline \cellcolor[gray]{0.95}Auteur & Nathan Bonnot, Jessy Sobreiro, Clovis de Villars, Hervé Vaterlaus, Pedro da Fonseca, Valentin Szabo \\
+        \hline \cellcolor[gray]{0.95}Date de mise à jour & 12 Juin 2020 \\
+        \hline \cellcolor[gray]{0.95}Version du modèle & 1.4 \\
+        \hline
+    \end{tabularx}
+\end{chunk}
+
+\begin{chunk}{}
+\section{Tableau des révisions}
+% Variable for the array
+\renewcommand{\
+}{1.4}
+\begin{tabularx}{\textwidth}{|l|X|X|l|X|}
+    \hline \rowcolor[gray]{0.95}Date & Version & Auteur & Sections & Commentaire \\
+    \hline 18/04/2020 & 1.0 & Nathan Bonnot  & Toutes & Première version \\
+    \hline 22/04/2020 & 1.1 & Jessy SOBREIRO, Clovis DE VILLARS & Toutes & Formatage du document, ajout diagramme, cartes des livrables et user stories \\
+    \hline 25/04/2020 & 1.2 & Jessy SOBREIRO, Clovis DE VILLARS & Toutes & Correction des références aux User stories, suppression du livrable organisation, ajout des livrables: intégration continue, scrapper. Rectification des estimations de charge. \\
+    \hline 21/05/2020 & 1.3 & Jessy SOBREIRO, Clovis DE VILLARS & 4, 6 & Pivot d’extension vers app de bureau, intégration des veilles dans les user stories \\
+    \hline 12/06/2020 & 1.4 & Jessy SOBREIRO, Clovis DE VILLARS & 3.3, 4.3 & Découpe des user stories, ajout des stories concernant le format générique \\
+    \hline
+\end{tabularx}
+\end{chunk}
+
+\setcounter{secnumdepth}{50}
+\setcounter{tocdepth}{50}
+
+\clearpage
+\tableofcontents
+
+\clearpage
+\begin{chunk}{section}
+    \section{Organigramme des livrables}
+    \centering
+    \begin{forest}
+        for tree={
+            draw,
+            align=center,
+            l=15mm
+        },
+        [D4DATA
+            [1 Front web]
+            [2 Extension \\de navigateur]
+            [3 Traitement \\des archives]
+            [4 Support \\multi services]
+            [5 Intégration \\continue]
+            [6 Application \\de bureau]
+        ]
+    \end{forest}
+\end{chunk}
+\section{Cartes des livrables}
+\begin{chunk}{subsection}
+    \subsection{Front web}
+    % Variables for the array
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{\textwidth}{|X|X|}
+        \hline \multicolumn{2}{|c|}{\cellcolor[gray]{0.9}Frontweb}\\
+        \hline 1 Page d'accueil & 2 Tableau de bord \\
+        \hline
+    \end{tabularx}
+\end{chunk}
+\begin{chunk}{subsection}
+    \subsection{Front web}
+    % Variables for the array
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{\textwidth}{|X|X|}
+        \hline \multicolumn{2}{|c|}{\cellcolor[gray]{0.9}Frontweb}\\
+        \hline 1 Page d'accueil & 2 Tableau de bord \\
+        \hline
+    \end{tabularx}
+\end{chunk}
+
+\clearpage
+\section{User stories}
+\subsection{Front web}
+\subsubsection{Page d'accueil}
+\paragraph{Squelette}\mbox{}\\
+
+\begin{chunk}{}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{\linewidth}{|X|X|}
+        \hline
+        \multicolumn{2}{|>{\columncolor[gray]{.9}\centering}m{\rowWidth}|}{\textbf{Squelette}}\\
+        \hline
+        \rowcolor[gray]{0.95}En tant que : & Je veux :\\
+        \hline
+        Utilisateur lambda & Naviguer sur l’interface D4Data\\
+        \hline
+        \multicolumn{2}{|>{\columncolor[gray]{.95}}p{\rowWidth}|}{
+            Description :
+            \newline
+            L’utilisateur pourra découvrir l’objectif de D4Data et comment l’utiliser.L’utilisateur pourra découvrir l’objectif de D4Data et comment l’utiliser.
+        } \\
+        \hline
+        \multicolumn{2}{|p{\rowWidth}|}{
+            Definition of Done : \begin{itemize}
+                \item Une page descriptive du projet s’intégrant dans le squelette décrit en 4.1.1.1
+            \end{itemize}
+        } \\
+        \hline
+        \rowcolor[gray]{0.9}Charge estimée : & 0.5 jours-homme (4 heures)\\
+        \hline
+    \end{tabularx}
+\end{chunk}
+
+
+\end{document}
