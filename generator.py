@@ -113,7 +113,9 @@ def generate_user_story(userStory: object) -> str:
         [userStory.get("user"), userStory.get("action")],
         [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Description :\\newline {userStory.get('description')}")],
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Definition of Done : {add_itemization(userStory.get('definitionOfDone'))}")],
-        [add_cell_color("gray", 0.95, "Charge estimée :", "row"), f"{userStory.get('estimatedDuration')} jours-homme ({int(userStory.get('estimatedDuration') * 8)} heures)"], 
+        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Assignation : {', '.join(userStory.get('assignments'))}")],
+        ["Charge estimée :", f"{userStory.get('estimatedDuration')} jours-homme ({int(userStory.get('estimatedDuration') * 8)} heures)"],
+        [add_cell_color("gray", 0.95, "Status :", "row"), f"{userStory.get('status')}"]
     ]))
 
 def generate_recursively_user_stories(data: list, depth: int = 1) -> str:
