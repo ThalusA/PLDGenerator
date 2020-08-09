@@ -151,11 +151,3 @@ def generate_pld(json: object) -> str:
         generate_delivrables(json.get("deliverables")) +
         generate_user_stories(json.get("deliverables"))
     )
-
-from json import load
-
-with open('template.json') as json_file:
-    data = load(json_file)
-    out = generate_pld(data)
-    with open('out.tex', "w") as tex_file:
-        tex_file.write(out)

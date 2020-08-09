@@ -139,4 +139,4 @@ cython_debug/
 
 # latex
 out.*
-test.py
+svg-inkscape
