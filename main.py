@@ -20,7 +20,7 @@ if __name__ == "__main__":
         with open('out.tex', "w") as tex_file:
             tex_file.write(tex)
         print("LaTeX file saved at ./out.tex")
-        system("pdflatex -shell-escape ./out.tex")
+        system(f"latexmk -shell-escape -pdf -quiet ./out.tex")
         print("PDF file saved at ./out.pdf")
     quit(0)
     

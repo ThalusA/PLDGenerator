@@ -1,6 +1,5 @@
 # Requirements
 
-You need first to install `inkscape`
-If you don't have `pdflatex` please install texlive
+You need first to install `inkscape` and `latexmk`
 
 Then you can run ./main.py
