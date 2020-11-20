@@ -1,6 +1,7 @@
 from templates import *
-import numpy as np
+from typing import Union
 from datetime import datetime
+import numpy as np
 
 def generate_options() -> str:
     final_str = add_chunk_environ()
@@ -115,8 +116,19 @@ def generate_user_story(userStory: object) -> str:
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Definition of Done : {add_itemization(userStory.get('definitionOfDone'))}")],
         [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Assignation : {', '.join(userStory.get('assignments'))}")],
         ["Charge estimée :", f"{userStory.get('estimatedDuration')} jours-homme ({int(userStory.get('estimatedDuration') * 8)} heures)"],
-        [add_cell_color("gray", 0.95, "Status :", "row"), f"{userStory.get('status')}"]
+        [add_cell_color("gray", 0.95, "Status :", "row"), f"{userStory.get('status')}"],
+        [add_multicolumn(2, "|p{\\rowWidth}|", f"Commentaires :\\newline {generate_comments(userStory.get('comments'))}")],
     ]))
+
+def generate_comments(comments: Union[str, list]) -> str:
+    result = ""
+    if isinstance(comments, str):
+        comments = [comments]
+    for idx, comment in enumerate(comments):
+        result += "- " + comment
+        if idx < len(comments) -1:
+            result += "\\newline"
+    return result
 
 def generate_recursively_user_stories(data: list, depth: int = 1) -> str:
     if data == None: return ""
