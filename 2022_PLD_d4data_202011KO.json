@@ -1,0 +1,757 @@
+{
+  "$schema" : "https://raw.githubusercontent.com/super-bunny/pld-json-schema/master/schemas/pld.json",
+  "config" : {
+    "dateFormat" : "dd/mm/yy"
+  },
+  "title" : "D4DATA Project Log Document",
+  "subTitle" : "Promotion 2022",
+  "description" : "Document décrivant l’évolution du projet D4Data sur le sprint 2",
+  "authors" : [
+    "Clovis de Villars",
+    "Pedro Da Fonseca",
+    "Jessy Sobreiro",
+    "Nathan Bonnot",
+    "Hervé Vaterlaus",
+    "Valentin Szabo"
+  ],
+  "versions" : [
+    {
+      "version" : "3.0.0",
+      "date" : "18/11/20",
+      "author" : [
+        "Clovis",
+        "Jessy"
+      ],
+      "sections" : "Toutes",
+      "comment" : "Première version"
+    }
+  ],
+  "deliverables" : [
+    {
+      "type" : "deliverable",
+      "name" : "Traitements des archives",
+      "subsets" : []
+    },
+    {
+      "type" : "deliverable",
+      "name" : "Extension navigateur",
+      "subsets" : [
+        {
+          "type" : "subset",
+          "name" : "Consentement utilisateur",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Récupération du consentement utilisateur",
+              "description" : "Pages permettant de récuperer le consentement de l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Obtenir le consentement de l'utilisateur",
+              "definitionOfDone" : [
+                "Page demandant des autorisations",
+                "Séléction des services à récupérer automatiquement"
+              ],
+              "assignments" : [
+                "Hervé"
+              ],
+              "estimatedDuration" : 2,
+              "status" : "WIP"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Page d'acceuil",
+              "description" : "Contenu du 'popup' affiché lors du clic sur l'icone de l'extension. Liste les services supportés et permet à l'utilisateur de lancer la récupération automatique d'une archive. Permet aussi le suivi de la récupération via l'affichage d'un statut pour chaque service.",
+              "user" : "Utilisateur lambda",
+              "action" : "Lancer la recuperation d'une archive et visualiser l'avancement de la récupération",
+              "definitionOfDone" : [
+                "Liste des services supportés",
+                "Bouton pour lancer la récupération automatique d'une archive",
+                "Affichage du status de récupération pour chaque service",
+                "Bouton pour télécharger l'archive une fois celle-ci récupérer automatiquement"
+              ],
+              "assignments" : [
+                "Hervé"
+              ],
+              "estimatedDuration" : 3,
+              "status" : "WIP"
+            }
+          ]
+        },
+        {
+          "type" : "subset",
+          "name" : "Récupération automatique de l'archive Facebook",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Demande de récupération de l'archive",
+              "description" : "Demander l'archive Facebook de l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Demander l'archive Facebook",
+              "definitionOfDone" : [
+                "L'extension simule des clics sur la page de récupération de l'archive sans que cela soit visible"
+              ],
+              "assignments" : [
+                "Hervé",
+                "Pedro"
+              ],
+              "estimatedDuration" : 3,
+              "status" : "WIP",
+              "comments" : [
+                "11/11/20 : Ajout de Pedro pour aider Hervé à résoudre les problèmes rencontrés et ratraper le retard accumulé"
+              ]
+            },
+            {
+              "type" : "userStory",
+              "name" : "Détecter la disponibilité de l'archive",
+              "description" : "Détecter que l'archive est disponible",
+              "user" : "Serveur applicatif",
+              "action" : "Détecter la disponibilité de l'archive",
+              "definitionOfDone" : [
+                "L'extension détecte que l'archive est disponible"
+              ],
+              "assignments" : [
+                "Hervé"
+              ],
+              "estimatedDuration" : 3,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Notification de l'utilisateur lorsque l'archive est disponible",
+              "description" : "Notifier l'utilisateur de la disponibilité de l'archive",
+              "user" : "Serveur applicatif",
+              "action" : "Notifier l'utilisateur",
+              "definitionOfDone" : [
+                "L'extension notifie l'utilisateur grâce à l'API notifications du browser"
+              ],
+              "assignments" : [
+                "Hervé"
+              ],
+              "estimatedDuration" : 1,
+              "status" : "To do"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type" : "deliverable",
+      "name" : "Support de Facebook",
+      "subsets" : [
+        {
+          "type" : "subset",
+          "name" : "Données spécifiques",
+          "description" : "Données spécifiques à l'archive Facebook",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Extraction des vidéos et contenus visionnés",
+              "description" : "Vidéos et contenus visionnés avec temps de visionnage",
+              "user" : "Server applicatif",
+              "action" : "Extraire les données relatives aux vidéos et contenus visionnés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les données relatives aux vidéos et contenus visionnés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 2,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des publicités",
+              "description" : "Centre d'intérêt de l'utilisateur à destination des publicitaires",
+              "user" : "Server applicatif",
+              "action" : "Extraire les données relatives aux publicités avec lesquelles l'utilisateur a intéragi",
+              "definitionOfDone" : [
+                "Fonction qui extrait les données relatives aux publicités avec lesquelles l'utilisateur a intéragi"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des notifications",
+              "description" : "",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les données relatives aux notifications",
+              "definitionOfDone" : [
+                "Fonction qui extrait les données relatives aux notifications"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des centres d'intérêts",
+              "description" : "Centre d'intérêt de l'utilisateur à destination des publicitaires",
+              "user" : "Server applicatif",
+              "action" : "Extraire les données relatives aux centres d'intérêts",
+              "definitionOfDone" : [
+                "Fonction qui extrait les données relatives aux centres d'intérêts"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des pages et profils consultés",
+              "description" : "Pages et profils consultés par l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les données relatives aux pages et profils consultés par l'utilisateur",
+              "definitionOfDone" : [
+                "Fonction qui extrait les données relatives aux pages et profils consultés par l'utilisateur"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 1,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des marques possédant des informations sur l'utilisateur",
+              "description" : "Marques ayant des données relatives à l'utilisateur (mail, téléphone, images...)",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les marques possédant des données sur l'utilisateur",
+              "definitionOfDone" : [
+                "Fonction qui extrait une liste de marques possédant des données sur l'utilisateur"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des activités effectuées en dehors de Facebook",
+              "description" : "Marques ayant des données relatives à l'utilisateur (mail, téléphone, images...)",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les activités effectuées en dehors de Facebook",
+              "definitionOfDone" : [
+                "Fonction qui extrait les activités effectuées en dehors de Facebook"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des commentaires",
+              "description" : "Commentaires rédigés sur des posts (pièce-jointe possible)",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les commentaires rédigés sur des posts",
+              "definitionOfDone" : [
+                "Fonction qui extrait les commentaires rédigés sur des posts",
+                "Support des pièces-jointes"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des invitations et de leur réponse",
+              "description" : "Invitations a des évènements reçus et leur réponse",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les invitations reçues et leur réponse",
+              "definitionOfDone" : [
+                "Fonction qui extrait les invitations reçues et leur réponse",
+                "Fonction qui extrait les réponses aux invitations reçues"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 2,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des demandes d'ami ",
+              "description" : "Demandes d'ami envoyées, reçues et rejetées et amis supprimés",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les demandes d'ami",
+              "definitionOfDone" : [
+                "Fonction qui extrait les demandes d'ami reçues",
+                "Fonction qui extrait les demandes d'ami envoyées",
+                "Fonction qui extrait les demandes d'ami rejetés",
+                "Fonction qui extrait les amis supprimés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 2,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des pages anciennement suivies",
+              "description" : "Pages qui ont été suives dans le passé mais qui ne le sont plus",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les pages anciennement suivies",
+              "definitionOfDone" : [
+                "Fonction qui extrait les pages anciennement suivies"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des préférences",
+              "description" : "Préférences de l'utilisateur (réglages) : contacts bloqués, paramètres de langue, etc.",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les préférences",
+              "definitionOfDone" : [
+                "Fonction qui extrait les préférences relatives à la langue",
+                "Fonction qui extrait les contacts bloqués",
+                "Fonction qui extrait les pages qui apparaissent en premier"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des données de reconnaissance faciale",
+              "description" : "Reconnaissance faciale : nombre de fois où la photo de l'utilisateur est détectée",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les données de reconnaissance faciale",
+              "definitionOfDone" : [
+                "Fonction qui extrait le nombre de fois où la photo de l'utilisateur est détectée"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des groupes",
+              "description" : "Groupes rejoints par l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les groupes rejoints",
+              "definitionOfDone" : [
+                "Fonction qui extrait les groupes rejoints"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des pokes",
+              "description" : "Pokes reçus par l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les pokes reçus",
+              "definitionOfDone" : [
+                "Fonction qui extrait les pokes reçus"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction de l'historique de recherches",
+              "description" : "Historique de recherche de l'utilisateur sur Facebook",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire l'historique des recherches",
+              "definitionOfDone" : [
+                "Fonction qui extrait l'historique des recherches"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des contenus signalés",
+              "description" : "Contenus signalés par l'utilisateur au support Facebook",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les contenus signalés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les contenus signalés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des recommandations",
+              "description" : "Contenu recommandé sur le fil d'activité de l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire le contenu recommandé sur le fil d'activité de l'utilisateur",
+              "definitionOfDone" : [
+                "Fonction qui extrait le contenu recommandé sur le fil d'activité de l'utilisateur"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            }
+          ]
+        },
+        {
+          "type" : "subset",
+          "name" : "Données génériques",
+          "description" : "Données communes aux archives des autres services",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Extraction des appareils autorisés",
+              "description" : "Appareils sur lesquels l'utilisateur s'est connecté",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les appareils autorisés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les appareils autorisés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des pages likées",
+              "description" : "Pages likées par l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les groupes rejoints",
+              "definitionOfDone" : [
+                "Fonction qui extrait les groupes rejoints"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des réactions",
+              "description" : "Réactions sur les posts de l'utilisateur",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les reactions sur les posts de l'utilisateur",
+              "definitionOfDone" : [
+                "Fonction qui extrait les réactions sur les posts de l'utilisateur"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 1,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des notifications",
+              "description" : "",
+              "user" : "Serveur applicatif",
+              "action" : "Extraire les données relatives aux notifications",
+              "definitionOfDone" : [
+                "Fonction qui extrait les notifications",
+                "Standardisation des notifications à travers les services (json schéma)"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des applications connectées (API)",
+              "description" : "Applications tierces connectées à l'API Facebook sur le compte de l'utilisateur (SSO)",
+              "user" : "Server applicatif",
+              "action" : "Extraire les applications tierces connectées à Facebook sur le compte de l'utilisateur",
+              "definitionOfDone" : [
+                "Fonction qui extrait les applications tierces connectées à Facebook sur le compte de l'utilisateur"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction de la liste de contacts",
+              "description" : "Liste de contacts de l'utilisateur (contacts importés du téléphone)",
+              "user" : "Server applicatif",
+              "action" : "Extraire les contacts importés du téléphone",
+              "definitionOfDone" : [
+                "Fonction qui extrait les contacts importés du téléphone"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type" : "deliverable",
+      "name" : "Support de Discord",
+      "subsets" : [
+        {
+          "type" : "subset",
+          "name" : "Données spécifiques",
+          "description" : "Données spécifiques à l'archive Discord",
+          "userStories" : []
+        },
+        {
+          "type" : "subset",
+          "name" : "Données génériques",
+          "description" : "Données communes aux archives des autres services",
+          "userStories" : []
+        }
+      ]
+    },
+    {
+      "type" : "deliverable",
+      "name" : "Support de Reddit",
+      "subsets" : [
+        {
+          "type" : "subset",
+          "name" : "Données spécifiques",
+          "description" : "Données spécifiques à l'archive Reddit",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Extraction des commentaires récompensés",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les commentaires récompensés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les commentaires récompensés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des posts récompensés",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les posts récompensés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les posts récompensés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des posts cachés",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les posts cachés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les posts cachés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des multireddits",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les multireddits (regroupement de subreddits suivis)",
+              "definitionOfDone" : [
+                "Fonction qui extrait les multireddits"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des votes de formulaire",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les votes de formulaire",
+              "definitionOfDone" : [
+                "Fonction qui extrait les votes de formulaire"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des transactions de gold",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les transactions de gold",
+              "definitionOfDone" : [
+                "Fonction qui extrait les transactions de gold"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des commentaires sauvegardés",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les commentaires sauvegardés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les commentaires sauvegardés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des posts sauvegardés",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les posts sauvegardés",
+              "definitionOfDone" : [
+                "Fonction qui extrait les posts sauvegardés"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            }
+          ]
+        },
+        {
+          "type" : "subset",
+          "name" : "Données génériques",
+          "description" : "Données communes aux archives des autres services",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Extraction des chats",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les chats",
+              "definitionOfDone" : [
+                "Fonction qui extrait les chat et les retourne dans le format spécifié par le schéma JSON"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des commentaires",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les chats",
+              "definitionOfDone" : [
+                "Fonction qui extrait les chats et les retourne dans le format spécifié par le schéma JSON (Post)"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des connexions",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les connexions",
+              "definitionOfDone" : [
+                "Fonction qui extrait les connexions et les retourne dans le format spécifié par le schéma JSON (Connexion)"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des messages",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les messages",
+              "definitionOfDone" : [
+                "Nouveau schéma JSON représentant un Message",
+                "Fonction qui extrait les messages et les retourne dans le format spécifié par le schéma JSON (Messages)"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Extraction des abonnements (subreddit)",
+              "description" : "",
+              "user" : "Server applicatif",
+              "action" : "Extraire les subreddits que le propriétaire de l'archive suit",
+              "definitionOfDone" : [
+                "Fonction qui extrait les abonnements"
+              ],
+              "assignments" : [],
+              "estimatedDuration" : 0.5,
+              "status" : "To do"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type" : "deliverable",
+      "name" : "Intégration continue",
+      "subsets" : [
+        {
+          "type" : "subset",
+          "name" : "GitHub Actions",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Generation automatique des executables",
+              "description" : "Génération automatique des executables (installeur) de l'aplication pour tous les sytèmes d'exploitation",
+              "user" : "Utilisateur lambda",
+              "action" : "Télécharger l'application D4Data",
+              "definitionOfDone" : [
+                "Lors d'un push sur la branch master, une pipeline GitHub Actions est executée",
+                "L'Action télécharge le repo contenant le code D4Data",
+                "L'Action execute des scripts permettant la génération d'un unique binaire",
+                "L'Action créée une Release GitHub contenant les artéfacts de build (binaire)"
+              ],
+              "assignments" : [
+                "Jessy"
+              ],
+              "estimatedDuration" : 2,
+              "status" : "WIP"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type" : "deliverable",
+      "name" : "Organisation",
+      "subsets" : [
+        {
+          "type" : "subset",
+          "name" : "PLD",
+          "userStories" : [
+            {
+              "type" : "userStory",
+              "name" : "Support du champ commentaire dans le générateur de PLD",
+              "description" : "Le générateur de PLD doit supporter un champ de commentaire sur les user stories",
+              "user" : "Développeur D4Data",
+              "action" : "Commenter les user stories",
+              "definitionOfDone" : [
+                "Le PLD au format PDF doit comporter les commentaires des user stories présent dans le PLD au format JSON"
+              ],
+              "assignments" : [
+                "Jessy"
+              ],
+              "estimatedDuration" : 0.5,
+              "status" : "Done"
+            },
+            {
+              "type" : "userStory",
+              "name" : "Support du champ description dans le générateur de PLD",
+              "description" : "Le générateur de PLD doit supporter un champ de description pour les delivrables et les subsets",
+              "user" : "Développeur D4Data",
+              "action" : "Décrire les delivrables",
+              "definitionOfDone" : [
+                "Le PLD au format PDF doit pouvoir comporter une description pour les delivrables et subsets"
+              ],
+              "assignments" : [
+                "Jessy"
+              ],
+              "estimatedDuration" : 0.5,
+              "status" : "Done"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

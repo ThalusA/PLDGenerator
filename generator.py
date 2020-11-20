@@ -104,8 +104,10 @@ def generate_user_story(userStory: object) -> str:
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Commentaires :\\newline {generate_comments(userStory.get('comments'))}")], ]))
 
 
-def generate_comments(comments: Union[str, list]) -> str:
+def generate_comments(comments: Union[None, str, list]) -> str:
     result = ""
+    if comments == None:
+       return ""
     if isinstance(comments, str):
         comments = [comments]
     for idx, comment in enumerate(comments):
