@@ -38,10 +38,12 @@
     {
       "type": "deliverable",
       "name": "Interface",
+      "description": "This is the deliverable description. For example: this is the interface and this is where the user accesses its data.",
       "subsets": [
         {
           "type": "subset",
           "name": "Composants",
+          "description": "This is the subset description. For example: the components are the individual cards showing data.",
           "userStories": [
             {
               "type": "userStory",
