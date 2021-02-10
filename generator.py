@@ -37,15 +37,17 @@ def generate_first_page(subtitle: str = "") -> str:
 
 def generate_stats(json: object) -> (str, str):
     authors_score = dict(zip(json.get("authors"), [float(0.0)] * len(json.get("authors"))))
+    total_score = float(0.0)
     for deliverable in json.get("deliverables"):
         for subset in deliverable.get("subsets"):
             for userStory in subset.get("userStories"):
+                total_score += userStory.get("estimatedDuration")
                 for author in userStory.get("assignments"):
                     for saved_author in json.get("authors"):
                         if author in saved_author:
                             authors_score[saved_author] += userStory.get("estimatedDuration")
                             break
-    return  f"{sum(authors_score.values()):g}", "\\newline ".join(map(lambda value: f"{value[0]}: {value[1]:g}", authors_score.items()))
+    return  f"{total_score:g}", "\\newline ".join(map(lambda value: f"{value[0]}: {value[1]:g}", authors_score.items()))
 
 
 def generate_document_description(doc_desc: object, last_version_desc: object, local: str = "fr_FR.UTF-8") -> str:
