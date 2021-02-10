@@ -24,7 +24,7 @@ if __name__ == "__main__":
             with open(f"{name}.tex", "w") as tex_file:
                 tex_file.write(tex)
             print(f"LaTeX file saved at ./{name}.tex")
-            process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", f"./{name}.tex"])
+            process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", "-f", f"./{name}.tex"])
             ret = process.wait()
             if ret != 0:
                 quit(ret)
