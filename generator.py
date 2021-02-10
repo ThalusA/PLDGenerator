@@ -32,7 +32,7 @@ def generate_dependencies() -> str:
 
 def generate_first_page(subtitle: str = "") -> str:
     return add_page_centered(add_figure(customs_data=["\\item\\maketitle"]) + add_space(size="4cm") + add_style("bold", add_size("Large",
-        subtitle))) if subtitle != "" else add_page_centered(add_figure(customs_data=["\\item\\maketitle"]))
+        escape_str(subtitle)))) if subtitle != "" else add_page_centered(add_figure(customs_data=["\\item\\maketitle"]))
 
 
 def generate_stats(json: object) -> (str, str):
@@ -47,16 +47,16 @@ def generate_stats(json: object) -> (str, str):
                         if author in saved_author:
                             authors_score[saved_author] += userStory.get("estimatedDuration")
                             break
-    return  f"{total_score:g}", "\\newline ".join(map(lambda value: f"{value[0]}: {value[1]:g}", authors_score.items()))
+    return  f"{total_score:g}", "\\newline ".join(map(lambda value: f"{escape_str(value[0])}: {value[1]:g}", authors_score.items()))
 
 
 def generate_document_description(doc_desc: object, last_version_desc: object, local: str = "fr_FR.UTF-8") -> str:
     total_jours_hommes, distributions_jours_hommes = generate_stats(doc_desc)
     return add_chunk(add_depth_title("Description du document") + add_arraystreching(1.4) + add_tabularx("|l|X|", [
-        [add_cell_color("gray", 0.95, "Titre"), doc_desc.get("title")], [add_cell_color("gray", 0.95, "Description"), doc_desc.get("description")],
-        [add_cell_color("gray", 0.95, "Auteur"), ", ".join(doc_desc.get("authors"))],
+        [add_cell_color("gray", 0.95, "Titre"), escape_str(doc_desc.get("title"))], [add_cell_color("gray", 0.95, "Description"), escape_str(doc_desc.get("description"))],
+        [add_cell_color("gray", 0.95, "Auteur"), escape_str(", ".join(doc_desc.get("authors")))],
         [add_cell_color("gray", 0.95, "Date de mise à jour"), last_version_desc.get("date")],
-        [add_cell_color("gray", 0.95, "Version du modèle"), last_version_desc.get("version")],
+        [add_cell_color("gray", 0.95, "Version du modèle"), escape_str(last_version_desc.get("version"))],
         [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}\\centering}m{\\rowWidth}|", add_style("bold", "Statistiques", newline=False))],
         [add_cell_color("gray", 0.95, "Distributions jours-hommes"), distributions_jours_hommes],
         [add_cell_color("gray", 0.95, "Total jours-hommes"), total_jours_hommes]]))
@@ -65,20 +65,20 @@ def generate_document_description(doc_desc: object, last_version_desc: object, l
 def generate_document_versions_table(versions: list) -> str:
     content_list = [[add_cell_color("gray", 0.95, "Date", "row"), "Version", "Auteur", "Sections", "Commentaire"]]
     for version in versions:
-        content_list.append([version["date"], version["version"], ', '.join(version["author"]), version["sections"], version["comment"]])
+        content_list.append([escape_str(version["date"]), escape_str(version["version"]), escape_str(', '.join(version["author"])), escape_str(version["sections"]), escape_str(version["comment"])])
     return add_chunk(add_depth_title("Tableau des révisions") + add_arraystreching(1.4) + add_tabularx("|l|l|X|X|X|", content_list))
 
 
 def generate_toc() -> str:
     return add_toc_name("Table des matières") + add_newpage("\\tableofcontents")
-
+ 
 
 def generate_organigram(title: str, delivrables: list) -> str:
-    return add_newpage(add_chunk(add_depth_title("Organigramme des livrables") + add_content_centering(add_forest(title, delivrables)), "section"))
+    return add_newpage(add_chunk(add_depth_title("Organigramme des livrables") + add_content_centering(add_forest(escape_str(title), delivrables)), "section"))
 
 
 def generate_recursively_delivrables(data: object = {}, depth: list = [], content: list = []) -> list:
-    content.append(f"{depth_to_string(depth)}{data.get('name')}")
+    content.append(escape_str(f"{depth_to_string(depth)}{data.get('name')}"))
     to_process = data.get('subsets') or data.get('userStories')
     if to_process != None:
         length = len(depth)
@@ -104,23 +104,23 @@ def generate_delivrables(delivrables: list) -> str:
             if data_len > max_length: max_length = data_len
             subarrays.append(data)
         subarrays = list(map(lambda x: np.pad(x, (0, max_length - len(x)), 'constant', constant_values='').tolist(), subarrays))
-        contents.append([[add_multicolumn(length, '|c|', add_cell_color("gray", 0.95, delivrable.get("name")))]] + np.transpose(subarrays).tolist())
+        contents.append([[add_multicolumn(length, '|c|', add_cell_color("gray", 0.95, escape_str(delivrable.get("name"))))]] + np.transpose(subarrays).tolist())
     for i in range(len(contents)):
-        final_str += add_chunk(add_depth_title(delivrables[i].get("name"), 1) + add_arraystreching(1.4) + add_tabularx(options[i], contents[i]),
+        final_str += add_chunk(add_depth_title(escape_str(delivrables[i].get("name")), 1) + add_arraystreching(1.4) + add_tabularx(options[i], contents[i]),
             'subsection')
     return final_str
 
 
 def generate_user_story(userStory: object) -> str:
     return add_chunk(add_arraystreching(1.4) + add_tabularx("|X|X|", [
-        [add_multicolumn(2, "|>{\\columncolor[gray]{0.9}\\centering}m{\\rowWidth}|", add_style("bold", userStory.get("name"), newline=False))],
-        [add_cell_color("gray", 0.95, "En tant que :", "row"), "Je veux :"], [userStory.get("user"), userStory.get("action")],
-        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Description :\\newline {userStory.get('description')}")],
+        [add_multicolumn(2, "|>{\\columncolor[gray]{0.9}\\centering}m{\\rowWidth}|", add_style("bold", escape_str(userStory.get("name")), newline=False))],
+        [add_cell_color("gray", 0.95, "En tant que :", "row"), "Je veux :"], [escape_str(userStory.get("user")), escape_str(userStory.get("action"))],
+        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Description :\\newline {escape_str(userStory.get('description'))}")],
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Definition of Done : {add_itemization(userStory.get('definitionOfDone'))}")],
-        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Assignation : {', '.join(userStory.get('assignments'))}")],
+        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Assignation : {escape_str(', '.join(userStory.get('assignments')))}")],
         ["Charge estimée :", f"{userStory.get('estimatedDuration')} jours-hommes ({int(userStory.get('estimatedDuration') * 8)} heures)"],
-        [add_cell_color("gray", 0.95, "Status :", "row"), f"{userStory.get('status')}"],
-        [add_multicolumn(2, "|p{\\rowWidth}|", f"Commentaires :\\newline {generate_comments(userStory.get('comments'))}")], ]))
+        [add_cell_color("gray", 0.95, "Status :", "row"), f"{escape_str(userStory.get('status'))}"],
+        [add_multicolumn(2, "|p{\\rowWidth}|", f"Commentaires :\\newline {generate_comments(userStory.get('comments'))}")]]))
 
 
 def generate_comments(comments: Union[None, str, list]) -> str:
@@ -130,7 +130,7 @@ def generate_comments(comments: Union[None, str, list]) -> str:
     if isinstance(comments, str):
         comments = [comments]
     for idx, comment in enumerate(comments):
-        result += "- " + comment
+        result += "- " + escape_str(comment)
         if idx < len(comments) - 1:
             result += "\\newline"
     return result
@@ -141,12 +141,12 @@ def generate_recursively_user_stories(data: list, depth: int = 1) -> str:
     content = ""
     for element in data:
         if element.get("type") == "userStory":
-            content += add_depth_title(element.get("name"), depth, True)
+            content += add_depth_title(escape_str(element.get("name")), depth, True)
             content += generate_user_story(element)
         else:
-            content += add_depth_title(element.get("name"), depth)
+            content += add_depth_title(escape_str(element.get("name")), depth)
             if element.get("description") is not None:
-                content += element.get("description")
+                content += escape_str(element.get("description"))
             content += generate_recursively_user_stories(element.get("subsets") or element.get("userStories"), depth + 1)
     return content
 
@@ -168,5 +168,5 @@ def generate_pld(json: object) -> str:
         json.get("subTitle")) + generate_document_description(isolate_json_tags(json, ["title", "description", "authors", "deliverables"]),
         isolate_json_tags(json["versions"][-1], ["date", "version"])) + generate_document_versions_table(json.get("versions")) + setcounter(
         "secnumdepth", 50) + setcounter("tocdepth", 50) + generate_toc() + generate_organigram("D4DATA",
-        list(map(lambda x: x["name"], json.get("deliverables")))) + generate_delivrables(json.get("deliverables")) + generate_user_stories(
+        list(map(lambda x: escape_str(x["name"]), json.get("deliverables")))) + generate_delivrables(json.get("deliverables")) + generate_user_stories(
         json.get("deliverables")))

@@ -59,7 +59,7 @@ def add_arraystreching(value: float = 0.0) -> str:
 def add_itemization(content: list = []) -> str:
     final_str = f"\\begin{{itemize}}\n"
     for element in content:
-        final_str += f"\t\t\\item {element}\n"
+        final_str += f"\t\t\\item {escape_str(element)}\n"
     final_str += f"\t\\end{{itemize}}"
     return final_str
 
