@@ -141,5 +141,11 @@ dmypy.json
 cython_debug/
 
 # latex
-out.*
+*.aux
+*.fdb_latexmk
+*.fls
+*.out
+*.pdf
+*.tex
+*.toc
 svg-inkscape
