@@ -35,12 +35,29 @@ def generate_first_page(subtitle: str = "") -> str:
         subtitle))) if subtitle != "" else add_page_centered(add_figure(customs_data=["\\item\\maketitle"]))
 
 
+def generate_stats(json: object) -> (str, str):
+    authors_score = dict(zip(json.get("authors"), [float(0.0)] * len(json.get("authors"))))
+    for deliverable in json.get("deliverables"):
+        for subset in deliverable.get("subsets"):
+            for userStory in subset.get("userStories"):
+                for author in userStory.get("assignments"):
+                    for saved_author in json.get("authors"):
+                        if author in saved_author:
+                            authors_score[saved_author] += userStory.get("estimatedDuration")
+                            break
+    return  f"{sum(authors_score.values()):g}", "\\newline ".join(map(lambda value: f"{value[0]}: {value[1]:g}", authors_score.items()))
+
+
 def generate_document_description(doc_desc: object, last_version_desc: object, local: str = "fr_FR.UTF-8") -> str:
+    total_jours_hommes, distributions_jours_hommes = generate_stats(doc_desc)
     return add_chunk(add_depth_title("Description du document") + add_arraystreching(1.4) + add_tabularx("|l|X|", [
         [add_cell_color("gray", 0.95, "Titre"), doc_desc.get("title")], [add_cell_color("gray", 0.95, "Description"), doc_desc.get("description")],
         [add_cell_color("gray", 0.95, "Auteur"), ", ".join(doc_desc.get("authors"))],
         [add_cell_color("gray", 0.95, "Date de mise à jour"), last_version_desc.get("date")],
-        [add_cell_color("gray", 0.95, "Version du modèle"), last_version_desc.get("version")]]))
+        [add_cell_color("gray", 0.95, "Version du modèle"), last_version_desc.get("version")],
+        [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}\\centering}m{\\rowWidth}|", add_style("bold", "Statistiques", newline=False))],
+        [add_cell_color("gray", 0.95, "Distributions jours-hommes"), distributions_jours_hommes],
+        [add_cell_color("gray", 0.95, "Total jours-hommes"), total_jours_hommes]]))
 
 
 def generate_document_versions_table(versions: list) -> str:
@@ -99,7 +116,7 @@ def generate_user_story(userStory: object) -> str:
         [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Description :\\newline {userStory.get('description')}")],
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Definition of Done : {add_itemization(userStory.get('definitionOfDone'))}")],
         [add_multicolumn(2, "|>{\\columncolor[gray]{0.95}}p{\\rowWidth}|", f"Assignation : {', '.join(userStory.get('assignments'))}")],
-        ["Charge estimée :", f"{userStory.get('estimatedDuration')} jours-homme ({int(userStory.get('estimatedDuration') * 8)} heures)"],
+        ["Charge estimée :", f"{userStory.get('estimatedDuration')} jours-hommes ({int(userStory.get('estimatedDuration') * 8)} heures)"],
         [add_cell_color("gray", 0.95, "Status :", "row"), f"{userStory.get('status')}"],
         [add_multicolumn(2, "|p{\\rowWidth}|", f"Commentaires :\\newline {generate_comments(userStory.get('comments'))}")], ]))
 
@@ -146,7 +163,7 @@ def isolate_json_tags(data: object, tags: list) -> object:
 def generate_pld(json: object) -> str:
     json["versions"] = sorted(json.get("versions") or [], key=lambda x: int(datetime.timestamp(datetime.strptime(x.get("date"), "%d/%m/%y"))))
     return generate_dependencies() + generate_options() + generate_style() + add_wrapper("document", generate_first_page(
-        json.get("subTitle")) + generate_document_description(isolate_json_tags(json, ["title", "description", "authors"]),
+        json.get("subTitle")) + generate_document_description(isolate_json_tags(json, ["title", "description", "authors", "deliverables"]),
         isolate_json_tags(json["versions"][-1], ["date", "version"])) + generate_document_versions_table(json.get("versions")) + setcounter(
         "secnumdepth", 50) + setcounter("tocdepth", 50) + generate_toc() + generate_organigram("D4DATA",
         list(map(lambda x: x["name"], json.get("deliverables")))) + generate_delivrables(json.get("deliverables")) + generate_user_stories(
