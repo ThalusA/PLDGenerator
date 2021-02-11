@@ -10,7 +10,6 @@ def add_page_style(logo_path: str = "logo.svg", sublogo_path: str = "sublogo.svg
 \\rhead{{\\Large Project Log Document}}
 \\rfoot{{Page \\thepage \\space of \\pageref{{LastPage}}}}
 \\lfoot{{\\includesvg[width = 100pt]{{{sublogo_path}}}}}
-\\setlength\\arrayrulewidth{{1pt}}
 
 \\fancypagestyle{{plain}}{{
     \\renewcommand{{\\headrulewidth}}{{0pt}}
