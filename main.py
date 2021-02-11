@@ -17,7 +17,7 @@ if __name__ == "__main__":
         print(f"USAGE\n\t{argv[0]} json_file\n\nDESCRIPTION\n\tjson_file\tpath of the json file which describes the PLD\n\t-f\t\tdon't generate files based on json file name")
         quit(2)
     else:
-        #try:
+        try:
             name = "out" if "-f" in argv else path.splitext(path.basename(argv[1]))[0]
             json = retrieve_json(argv[1])
             tex = generate_pld(json)
@@ -29,7 +29,7 @@ if __name__ == "__main__":
             if ret != 0:
                 quit(ret)
             print(f"PDF file saved at ./{name}.pdf")
-        #except:
+        except:
             quit(1)
     quit(0)
     
