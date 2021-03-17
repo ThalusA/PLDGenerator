@@ -1,4 +1,4 @@
-from templates import *
+from src.templates import *
 from typing import Union
 from datetime import datetime
 import numpy as np
@@ -11,11 +11,11 @@ def generate_options() -> str:
     return final_str
 
 
-def generate_style() -> str:
+def generate_style(title: str) -> str:
     final_str = add_new_command("\\rowWidth", "\\linewidth-(\\tabcolsep*2)")
     final_str += add_page_style()
     final_str += add_toc_name()
-    final_str += add_document_info("D4DATA PLD - Project Log Document")
+    final_str += add_document_info(title)
     return final_str
 
 
@@ -164,7 +164,7 @@ def isolate_json_tags(data: object, tags: list) -> object:
 
 def generate_pld(json: object) -> str:
     json["versions"] = sorted(json.get("versions") or [], key=lambda x: int(datetime.timestamp(datetime.strptime(x.get("date"), "%d/%m/%y"))))
-    return generate_dependencies() + generate_options() + generate_style() + add_wrapper("document", generate_first_page(
+    return generate_dependencies() + generate_options() + generate_style(json["title"]) + add_wrapper("document", generate_first_page(
         json.get("subTitle")) + generate_document_description(isolate_json_tags(json, ["title", "description", "authors", "deliverables"]),
         isolate_json_tags(json["versions"][-1], ["date", "version"])) + generate_document_versions_table(json.get("versions")) + setcounter(
         "secnumdepth", 50) + setcounter("tocdepth", 50) + generate_toc() + generate_organigram("D4DATA",

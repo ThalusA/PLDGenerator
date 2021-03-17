@@ -2,7 +2,7 @@
 from sys import argv
 from json import load
 from subprocess import Popen
-from generator import generate_pld
+from src.generator import generate_pld
 from os import path
 
 def retrieve_json(filepath: str) -> object:
