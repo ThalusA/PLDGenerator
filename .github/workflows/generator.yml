@@ -45,8 +45,7 @@ jobs:
           python main.py ./*.json
           
       - name: Upload PLD
-        if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: PLD
-          path: ./*.log
+          path: ./*.pdf
