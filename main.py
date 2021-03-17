@@ -17,19 +17,16 @@ if __name__ == "__main__":
         print(f"USAGE\n\t{argv[0]} json_file\n\nDESCRIPTION\n\tjson_file\tpath of the json file which describes the PLD\n\t-f\t\tdon't generate files based on json file name")
         quit(2)
     else:
-        try:
-            name = "out" if "-f" in argv else path.splitext(path.basename(argv[1]))[0]
-            json = retrieve_json(argv[1])
-            tex = generate_pld(json)
-            with open(f"{name}.tex", "w") as tex_file:
-                tex_file.write(tex)
-            print(f"LaTeX file saved at ./{name}.tex")
-            process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", "-f", f"./{name}.tex"])
-            ret = process.wait()
-            if ret != 0:
-                quit(ret)
-            print(f"PDF file saved at ./{name}.pdf")
-        except:
-            quit(1)
+        name = "out" if "-f" in argv else path.splitext(path.basename(argv[1]))[0]
+        json = retrieve_json(argv[1])
+        tex = generate_pld(json)
+        with open(f"{name}.tex", "w") as tex_file:
+            tex_file.write(tex)
+        print(f"LaTeX file saved at ./{name}.tex")
+        process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", "-f", f"./{name}.tex"])
+        ret = process.wait()
+        if ret != 0:
+            quit(ret)
+        print(f"PDF file saved at ./{name}.pdf")
     quit(0)
     

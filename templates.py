@@ -64,7 +64,7 @@ def add_itemization(content: list = []) -> str:
     return final_str
 
 def add_forest(title: str = "", content: list = [], spacing: str = "15mm") -> str:
-    final_str = f"\\adjustbox{{max width=\linewidth}}{'{'}\n\\begin{{forest}}\n\tfor tree={{draw, align=center, l={spacing}}},\n\t[{title}\n"
+    final_str = f"\\adjustbox{{max width=\\linewidth}}{'{'}\n\\begin{{forest}}\n\tfor tree={{draw, align=center, l={spacing}}},\n\t[{title}\n"
     content = adapt_content(content)
     for index, subtitle in enumerate(content):
         final_str += f"\t\t[{index + 1} {subtitle}]\n"
@@ -89,7 +89,7 @@ def add_figure(image_path: str = "logo.svg", customs_data: list = None) -> str:
     return final_str
 
 def add_shortstack(content: str = "", align: str = "l") -> str:
-    if align == "l" or align == "c" or align == "r": return f"\shortstack[{align}]{{{content}}}"
+    if align == "l" or align == "c" or align == "r": return f"\\shortstack[{align}]{{{content}}}"
     else: return content
 
 def add_space(spacetype: str = "vertical", size: str = "") -> str:

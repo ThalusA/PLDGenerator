@@ -93,7 +93,7 @@ def generate_delivrables(delivrables: list) -> str:
     final_str = add_depth_title("Carte des livrables")
     contents = []
     options = []
-    for idx, delivrable in enumerate(delivrables):
+    for delivrable in delivrables:
         length = len(delivrable.get("subsets"))
         options.append(f"|{'|'.join(['X'] * length if length != 0 else 'X')}|")
         subarrays = []
