@@ -150,4 +150,5 @@ cython_debug/
 *.toc
 *.synctex.gz
 *.json
+*.svg
 svg-inkscape
