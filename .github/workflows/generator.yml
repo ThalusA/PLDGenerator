@@ -48,4 +48,4 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: PLD
-          path: ./*.pdf
+          path: ./*.pdf ./*.log
