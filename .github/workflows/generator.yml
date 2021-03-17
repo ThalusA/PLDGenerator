@@ -1,0 +1,52 @@
+name: Process PLD file
+on:
+  workflow_dispatch:
+    inputs:
+      logoURL:
+        description: "URL of the logo.svg file"
+        required: true
+      sublogoURL:
+        description: "URL of the sublogo.svg file"
+        required: true
+      jsonURL:
+        description: "URL of the file.json file"
+        required: true
+  
+jobs:          
+  generate_pld:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install APT dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt update
+          sudo apt-get install -y inkscape latexmk texlive texlive-latex-extra wget
+      
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+       
+      - name: Retrieve all required data
+        run: |
+          wget ${{ github.event.inputs.logoURL }} -O assets/logo.svg
+          wget ${{ github.event.inputs.sublogoURL }} -O assets/sublogo.svg
+          wget ${{ github.event.inputs.jsonURL }} -O $(basename ${{ github.event.inputs.jsonURL }})
+                
+      - name: Generating PLD
+        run: |
+          python main.py ./*.json
+          
+      - name: Upload PLD
+        uses: actions/upload-artifact@v2
+        with:
+          name: PLD
+          path: ./*.pdf
