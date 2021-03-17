@@ -65,7 +65,7 @@ def generate_document_description(doc_desc: object, last_version_desc: object, l
 def generate_document_versions_table(versions: list) -> str:
     content_list = [[add_cell_color("gray", 0.95, "Date", "row"), "Version", "Auteur", "Sections", "Commentaire"]]
     for version in versions:
-        content_list.append([escape_str(version["date"]), escape_str(version["version"]), escape_str(', '.join(version["author"])), escape_str(version["sections"]), escape_str(version["comment"])])
+        content_list.append([escape_str(version["date"]), escape_str(version["version"]), escape_str(', '.join(version["authors"])), escape_str(version["sections"]), escape_str(version["comment"])])
     return add_chunk(add_depth_title("Tableau des révisions") + add_arraystreching(1.4) + add_tabularx("|l|l|X|X|X|", content_list))
 
 
