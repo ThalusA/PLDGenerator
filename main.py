@@ -3,7 +3,7 @@ from sys import argv
 from json import load
 from subprocess import Popen
 from src.generator import generate_pld
-from os import path
+from os import path, environ
 
 def retrieve_json(filepath: str) -> object:
     with open(filepath, "r") as json_file:
@@ -23,7 +23,7 @@ if __name__ == "__main__":
         with open(f"{name}.tex", "w") as tex_file:
             tex_file.write(tex)
         print(f"LaTeX file saved at ./{name}.tex")
-        process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", "-f", f"./{name}.tex"])
+        process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", "-f", f"./{name}.tex"], env=dict(environ, DISPLAY=""))
         ret = process.wait()
         if ret != 0:
             quit(ret)
