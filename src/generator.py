@@ -64,7 +64,7 @@ def generate_work_report_page(json: object) -> str:
     user_story_status_translations = {"WIP": "En cours", "Done": "Terminé", "To do": "A faire", "Abandoned": "Abandonnée"}
     user_story_status_priority = {"En cour": 3, "Terminé": 4, "A faire": 2, "Abandon": 1}
     return add_newpage(add_chunk(add_depth_title("Rapport d'avancement") + "\n".join(map(
-        lambda author_user_stories: add_depth_title(author_user_stories[0], 1) + add_itemization(
+        lambda author_user_stories: add_chunk(add_depth_title(author_user_stories[0], 1) + add_itemization(
             sorted(
                 map(
                     lambda user_story: user_story_status_translations.get(user_story.get("status")) + ": " + user_story.get("name"),
@@ -72,7 +72,7 @@ def generate_work_report_page(json: object) -> str:
                 ),
                 key=lambda status: user_story_status_priority[status[:7]], reverse=True
             ), ['noitemsep']
-        ), authors_user_stories.items()))))
+        )), authors_user_stories.items()))))
 
 def generate_document_description(doc_desc: object, last_version_desc: object, local: str = "fr_FR.UTF-8") -> str:
     total_jours_hommes, distributions_jours_hommes = generate_stats(doc_desc)
