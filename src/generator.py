@@ -1,5 +1,5 @@
 from src.templates import *
-from typing import Union
+from typing import Dict, Tuple, Union
 from datetime import datetime
 import numpy as np
 
@@ -23,7 +23,7 @@ def generate_dependencies() -> str:
     final_str = add_document_class("extarticle", "12pt")
     dependencies = [("svg", None), ("amsmath", None), ("fontenc", "T1"), ("inputenc", "utf8"), ("fancyhdr", None), ("lastpage", None),
                     ("hyperref", None), ("tgbonum", None), ("tabularx", None), ("colortbl", None), ("geometry", None), ("environ", None),
-                    ("calc", None), ("needspace", None), ("tocbibind", None), ("xcolor", None), ("forest", "linguistics"), ("adjustbox", None)]
+                    ("calc", None), ("needspace", None), ("tocbibind", None), ("xcolor", None), ("forest", "linguistics"), ("adjustbox", None), ("enumitem", None)]
     for name, opt in dependencies:
         final_str += add_package(name, opt)
     final_str += add_tikz_library()
@@ -35,7 +35,7 @@ def generate_first_page(subtitle: str = "") -> str:
         escape_str(subtitle)))) if subtitle != "" else add_page_centered(add_figure(customs_data=["\\item\\maketitle"]))
 
 
-def generate_stats(json: object) -> (str, str):
+def generate_stats(json: object) -> Tuple[str, str]:
     authors_score = dict(zip(json.get("authors"), [float(0.0)] * len(json.get("authors"))))
     total_score = float(0.0)
     for deliverable in json.get("deliverables"):
@@ -49,6 +49,30 @@ def generate_stats(json: object) -> (str, str):
                             break
     return  f"{total_score:g}", "\\newline ".join(map(lambda value: f"{escape_str(value[0])}: {value[1]:g}", authors_score.items()))
 
+def generate_work_report_page(json: object) -> str:
+    authors_user_stories = dict()
+    for deliverable in json.get("deliverables"):
+        for subset in deliverable.get("subsets"):
+            for userStory in subset.get("userStories"):
+                for author in userStory.get("assignments"):
+                    for saved_author in json.get("authors"):
+                        if author in saved_author:
+                            if saved_author in authors_user_stories:
+                                authors_user_stories[saved_author].append(userStory)
+                            else:
+                                authors_user_stories[saved_author] = [userStory]
+    user_story_status_translations = {"WIP": "En cours", "Done": "Terminé", "To do": "A faire", "Abandoned": "Abandonnée"}
+    user_story_status_priority = {"En cour": 3, "Terminé": 4, "A faire": 2, "Abandon": 1}
+    return add_newpage(add_chunk(add_depth_title("Rapport d'avancement") + "\n".join(map(
+        lambda author_user_stories: add_depth_title(author_user_stories[0], 1) + add_itemization(
+            sorted(
+                map(
+                    lambda user_story: user_story_status_translations.get(user_story.get("status")) + ": " + user_story.get("name"),
+                    author_user_stories[1]
+                ),
+                key=lambda status: user_story_status_priority[status[:7]], reverse=True
+            ), ['noitemsep']
+        ), authors_user_stories.items()))))
 
 def generate_document_description(doc_desc: object, last_version_desc: object, local: str = "fr_FR.UTF-8") -> str:
     total_jours_hommes, distributions_jours_hommes = generate_stats(doc_desc)
@@ -169,4 +193,5 @@ def generate_pld(json: object) -> str:
         isolate_json_tags(json["versions"][-1], ["date", "version"])) + generate_document_versions_table(json.get("versions")) + setcounter(
         "secnumdepth", 50) + setcounter("tocdepth", 50) + generate_toc() + generate_organigram("D4DATA",
         list(map(lambda x: escape_str(x["name"]), json.get("deliverables")))) + generate_delivrables(json.get("deliverables")) + generate_user_stories(
-        json.get("deliverables")))
+        json.get("deliverables")) + setcounter("secnumdepth", 0) + generate_work_report_page(
+        isolate_json_tags(json, ["title", "description", "authors", "deliverables"])))

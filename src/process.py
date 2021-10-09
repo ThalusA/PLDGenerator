@@ -31,6 +31,5 @@ def adapt_content(content: list = []) -> list:
 def depth_to_string(depth: list = []):
     return '.'.join(map(str, depth)) + ' '
 
-
 def escape_str(string: str) -> str:
     return string.replace("\\", "\\textbackslash").replace("&", "\\&").replace("%", "\\%").replace("$", "\\$").replace("#", "\\#").replace("_", "\\_").replace("{", "\\{").replace("}", "\\}").replace("~", "\\textasciitilde").replace("^", "\\textasciicircum")

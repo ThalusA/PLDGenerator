@@ -1,4 +1,5 @@
 from src.process import *
+from typing import List
 
 def add_page_style(logo_path: str = "logo.svg", sublogo_path: str = "sublogo.svg") -> str:
     return f"""
@@ -57,8 +58,8 @@ def add_tabularx(options: str = "", content: list = [[]], table_type: str = "\\t
 def add_arraystreching(value: float = 0.0) -> str:
     return f"\\renewcommand{{\\arraystretch}}{{{value}}}\n"
 
-def add_itemization(content: list = []) -> str:
-    final_str = f"\\begin{{itemize}}\n"
+def add_itemization(content: list = [], options: List[str] = []) -> str:
+    final_str = f"\\begin{{itemize}}{'[' + ','.join(options) + ']' if len(options) > 0 else ''}\n"
     for element in content:
         final_str += f"\t\t\\item {escape_str(element)}\n"
     final_str += f"\t\\end{{itemize}}"
