@@ -1,0 +1,272 @@
+{
+  "title": "PLDSchema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "title": "Title",
+      "description": "Main title on document title page",
+      "minLength": 1,
+      "type": "string"
+    },
+    "subtitle": {
+      "title": "Subtitle",
+      "description": "Subtitle on document title page",
+      "minLength": 1,
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "description": "Description of document",
+      "minLength": 1,
+      "type": "string"
+    },
+    "authors": {
+      "title": "Authors",
+      "description": "List of document authors",
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "versions": {
+      "title": "Versions",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Version"
+      }
+    },
+    "deliverables": {
+      "title": "Deliverables",
+      "description": "Project deliverable",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Deliverable"
+      }
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "definitions": {
+    "Version": {
+      "title": "Version",
+      "type": "object",
+      "properties": {
+        "version": {
+          "title": "Version",
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "type": "string"
+        },
+        "date": {
+          "title": "Date",
+          "description": "Release date of this version",
+          "type": "string",
+          "format": "date"
+        },
+        "authors": {
+          "title": "Authors",
+          "description": "Authors of this version",
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sections": {
+          "title": "Sections",
+          "description": "Which sections have been modified",
+          "minLength": 1,
+          "type": "string"
+        },
+        "comment": {
+          "title": "Comment",
+          "description": "Comment about this version",
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "version",
+        "date",
+        "sections",
+        "comment"
+      ]
+    },
+    "Status": {
+      "title": "Status",
+      "description": "An enumeration.",
+      "enum": [
+        "To do",
+        "WIP",
+        "Done",
+        "Abandoned"
+      ],
+      "type": "string"
+    },
+    "UserStory": {
+      "title": "UserStory",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "const": "user_story",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "description": "Name of the user story",
+          "minLength": 1,
+          "type": "string"
+        },
+        "user": {
+          "title": "User",
+          "description": "User that do the action of user story",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "description": "Action done by the user",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "description": "Detailed description of the user",
+          "type": "string"
+        },
+        "definitions_of_done": {
+          "title": "Definitions Of Done",
+          "description": "List of definition of done (list of goal) that must be done to complete the user story",
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimated_duration": {
+          "title": "Estimated Duration",
+          "description": "Number of estimated man day (8 hours)",
+          "multipleOf": 0.5,
+          "type": "number"
+        },
+        "due_date": {
+          "title": "Due Date",
+          "description": "User story due date",
+          "type": "string",
+          "format": "date"
+        },
+        "end_date": {
+          "title": "End Date",
+          "description": "Date when the user story was marked as Done",
+          "type": "string",
+          "format": "date"
+        },
+        "Status": {
+          "description": "User story work status",
+          "default": "To do",
+          "allOf": [
+            {
+              "$ref": "#/definitions/Status"
+            }
+          ]
+        },
+        "assignments": {
+          "title": "Assignments",
+          "description": "List of person assigned to work on this user story",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "comments": {
+          "title": "Comments",
+          "description": "Comment about the user story",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name",
+        "user",
+        "action",
+        "estimated_duration"
+      ]
+    },
+    "Subset": {
+      "title": "Subset",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "const": "subset",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "minLength": 1,
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "user_stories": {
+          "title": "User Stories",
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserStory"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "Deliverable": {
+      "title": "Deliverable",
+      "type": "object",
+      "properties": {
+        "type": {
+          "title": "Type",
+          "const": "deliverable",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "minLength": 1,
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "subsets": {
+          "title": "Subsets",
+          "description": "Subset that groups many user story",
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Subset"
+          }
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  }
+}

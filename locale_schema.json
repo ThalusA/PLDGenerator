@@ -1,0 +1,183 @@
+{
+  "title": "LocaleDictionary",
+  "type": "object",
+  "properties": {
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "document_description": {
+      "title": "Document Description",
+      "type": "string"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    },
+    "authors": {
+      "title": "Authors",
+      "type": "string"
+    },
+    "updated_date": {
+      "title": "Updated Date",
+      "type": "string"
+    },
+    "model_version": {
+      "title": "Model Version",
+      "type": "string"
+    },
+    "stats": {
+      "title": "Stats",
+      "type": "string"
+    },
+    "man_days_distribution": {
+      "title": "Man Days Distribution",
+      "type": "string"
+    },
+    "total_man_days": {
+      "title": "Total Man Days",
+      "type": "string"
+    },
+    "revision_table": {
+      "title": "Revision Table",
+      "type": "string"
+    },
+    "date": {
+      "title": "Date",
+      "type": "string"
+    },
+    "version": {
+      "title": "Version",
+      "type": "string"
+    },
+    "sections": {
+      "title": "Sections",
+      "type": "string"
+    },
+    "comment": {
+      "title": "Comment",
+      "type": "string"
+    },
+    "table_of_content": {
+      "title": "Table Of Content",
+      "type": "string"
+    },
+    "organigram": {
+      "title": "Organigram",
+      "type": "string"
+    },
+    "deliverable_map": {
+      "title": "Deliverable Map",
+      "type": "string"
+    },
+    "user_stories": {
+      "title": "User Stories",
+      "type": "string"
+    },
+    "as_user": {
+      "title": "As User",
+      "type": "string"
+    },
+    "user_want": {
+      "title": "User Want",
+      "type": "string"
+    },
+    "definition_of_done": {
+      "title": "Definition Of Done",
+      "type": "string"
+    },
+    "assignation": {
+      "title": "Assignation",
+      "type": "string"
+    },
+    "estimated_duration": {
+      "title": "Estimated Duration",
+      "type": "string"
+    },
+    "man_days": {
+      "title": "Man Days",
+      "type": "string"
+    },
+    "hours": {
+      "title": "Hours",
+      "type": "string"
+    },
+    "status": {
+      "title": "Status",
+      "type": "string"
+    },
+    "comments": {
+      "title": "Comments",
+      "type": "string"
+    },
+    "advancement_report": {
+      "title": "Advancement Report",
+      "type": "string"
+    },
+    "to_do": {
+      "title": "To Do",
+      "type": "string"
+    },
+    "wip": {
+      "title": "Wip",
+      "type": "string"
+    },
+    "done": {
+      "title": "Done",
+      "type": "string"
+    },
+    "abandoned": {
+      "title": "Abandoned",
+      "type": "string"
+    },
+    "project_log_document": {
+      "title": "Project Log Document",
+      "type": "string"
+    },
+    "page": {
+      "title": "Page",
+      "type": "string"
+    },
+    "of": {
+      "title": "Of",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "document_description",
+    "description",
+    "authors",
+    "updated_date",
+    "model_version",
+    "stats",
+    "man_days_distribution",
+    "total_man_days",
+    "revision_table",
+    "date",
+    "version",
+    "sections",
+    "comment",
+    "table_of_content",
+    "organigram",
+    "deliverable_map",
+    "user_stories",
+    "as_user",
+    "user_want",
+    "definition_of_done",
+    "assignation",
+    "estimated_duration",
+    "man_days",
+    "hours",
+    "status",
+    "comments",
+    "advancement_report",
+    "to_do",
+    "wip",
+    "done",
+    "abandoned",
+    "project_log_document",
+    "page",
+    "of"
+  ]
+}
