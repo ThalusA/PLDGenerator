@@ -152,3 +152,5 @@ cython_debug/
 *.json
 *.svg
 svg-inkscape
+/assets/
+!/assets/.gitkeep

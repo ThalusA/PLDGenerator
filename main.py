@@ -1,32 +1,38 @@
 #!/usr/bin/env python3
-from sys import argv
-from json import load
-from subprocess import Popen
-from src.generator import generate_pld
-from os import path, environ
+import json
+import argparse
+import locale
 
-def retrieve_json(filepath: str) -> object:
-    with open(filepath, "r") as json_file:
-        json_obj = load(json_file)
-        return json_obj
+from src.generator import generate_pld
+from pathlib import Path
+
+from src.schema import PLDSchema, LocaleDictionary
 
 if __name__ == "__main__":
-    argc = len(argv)
-    flag = "-f" in argv
-    if "-h" in argv or argc != 2 + flag:
-        print(f"USAGE\n\t{argv[0]} json_file\n\nDESCRIPTION\n\tjson_file\tpath of the json file which describes the PLD\n\t-f\t\tdon't generate files based on json file name")
-        quit(2)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--schema", help="only generate json schema", action='store_true')
+    parser.add_argument("-f", "--filepath", help="filepath of the json file which describe the PLD")
+    parser.add_argument("-o", "--output", help="filepath of the outputted pdf and tex file")
+    parser.add_argument("-l", "--locale", help="specify in which locale your PLD is (ex: fr_FR)",
+                        default=locale.getlocale()[0])
+    args = parser.parse_args()
+    if args.schema:
+        with open("pld_schema.json", "w") as file:
+            file.write(PLDSchema.schema_json(indent=2))
+        with open("locale_schema.json", "w") as file:
+            file.write(LocaleDictionary.schema_json(indent=2))
+    elif args.path and args.output:
+        locale_args = json.loads(str(Path("src/locale").joinpath(args.locale)))
+        locale = LocaleDictionary(**locale_args)
+        schema_args = json.loads(args.filepath)
+        schema = PLDSchema(**schema_args)
+        document = generate_pld(schema, locale)
+        tex_filepath = str(Path(args.output).with_suffix('.tex'))
+        pdf_filepath = str(Path(args.output).with_suffix('.pdf'))
+        document.generate_tex(tex_filepath)
+        document.generate_pdf(pdf_filepath, clean_tex=True)
+        print(f"LaTeX file saved at ./{tex_filepath}.pdf")
+        print(f"PDF file saved at ./{pdf_filepath}.pdf")
     else:
-        name = "out" if "-f" in argv else path.splitext(path.basename(argv[1]))[0]
-        json = retrieve_json(argv[1])
-        tex = generate_pld(json)
-        with open(f"{name}.tex", "w") as tex_file:
-            tex_file.write(tex)
-        print(f"LaTeX file saved at ./{name}.tex")
-        process = Popen(["latexmk", "-shell-escape", f"-jobname={name}", "-pdf", "-quiet", "-f", f"./{name}.tex"], env=dict(environ, DISPLAY=""))
-        ret = process.wait()
-        if ret != 0:
-            quit(ret)
-        print(f"PDF file saved at ./{name}.pdf")
+        parser.print_help()
     quit(0)
-    
