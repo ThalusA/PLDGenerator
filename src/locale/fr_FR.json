@@ -1,5 +1,5 @@
 {
-  "$ref": "../../locale_schema.json",
+  "$schema": "https://raw.githubusercontent.com/ThalusA/PLDGenerator/master/locale_schema.json",
   "title": "Titre",
   "document_description": "Description du document",
   "description": "Description",
