@@ -40,7 +40,7 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
     document.preamble.append(Command("renewcommand", Command("headrulewidth"), "0pt"))
     document.preamble.append(Command("fancyhf", ""))
     document.preamble.append(Command("svgpath", "assets/"))
-    document.preamble.append(Command("lhead", Command("includesvg", "width = 30pt", "logo.svg")))
+    document.preamble.append(Command("lhead", Command("includesvg", "width = 30pt", "primary_logo.svg")))
     document.preamble.append(Command("rhead", LargeText(locale.project_log_document)))
     document.preamble.append(Command("rfoot", [
         locale.page,
@@ -49,7 +49,7 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
         locale.of,
         Command("pageref", "LastPage")
     ]))
-    document.preamble.append(Command("lfoot", Command("includesvg", "width = 100pt", "sublogo.svg")))
+    document.preamble.append(Command("lfoot", Command("includesvg", "width = 100pt", "secondary_logo.svg")))
     document.preamble.append(Command("fancypagestyle", "plain", [
         Command("renewcommand", Command("headrulewidth"), "0pt"),
         Command("fancyhf"),
@@ -60,7 +60,7 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
             locale.of,
             Command("pageref", "LastPage")
         ]),
-        Command("lfoot", Command("includesvg", "width = 100pt", "sublogo.svg"))
+        Command("lfoot", Command("includesvg", "width = 100pt", "secondary_logo.svg"))
     ]))
     document.preamble.append(Command("renewcommand*"))
     document.preamble.append(Command("contentsname", locale.table_of_content))
@@ -91,7 +91,7 @@ def generate_first_page(schema: PLDSchema, document: Document) -> Document:
         with document.create(Center()):
             with document.create(Figure(position="htbp")) as plot:
                 plot: Figure
-                plot.add_image("logo.svg")
+                plot.add_image("primary_logo.svg")
                 plot.add_caption(str(Command("maketitle")))
             if schema.subtitle is not None:
                 document.append(VerticalSpace("4cm"))
