@@ -2,6 +2,14 @@
   "title": "PLDSchema",
   "type": "object",
   "properties": {
+    "locale": {
+      "description": "Locale of the PLD",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Locale"
+        }
+      ]
+    },
     "title": {
       "title": "Title",
       "description": "Main title on document title page",
@@ -46,9 +54,18 @@
     }
   },
   "required": [
+    "locale",
     "title"
   ],
   "definitions": {
+    "Locale": {
+      "title": "Locale",
+      "description": "An enumeration.",
+      "enum": [
+        "fr_FR"
+      ],
+      "type": "string"
+    },
     "Version": {
       "title": "Version",
       "type": "object",
@@ -165,7 +182,7 @@
           "type": "string",
           "format": "date"
         },
-        "Status": {
+        "status": {
           "description": "User story work status",
           "default": "To do",
           "allOf": [

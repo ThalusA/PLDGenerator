@@ -96,7 +96,7 @@ class UserStory(BaseModel):
                                       multiple_of=0.5)
     due_date: Optional[date_type] = Field(None, description="User story due date")
     end_date: Optional[date_type] = Field(None, description="Date when the user story was marked as Done")
-    status: Status = Field(Status.to_do, alias="Status", description="User story work status")
+    status: Status = Field(Status.to_do, description="User story work status")
     assignments: List[str] = Field(default_factory=list,
                                    description="List of person assigned to work on this user story")
     comments: Optional[Union[List[str], str]] = Field(None, description="Comment about the user story")
@@ -117,7 +117,12 @@ class Deliverable(BaseModel):
                                   min_items=1)
 
 
+class Locale(str, Enum):
+    french = "fr_FR"
+
+
 class PLDSchema(BaseModel):
+    locale: Locale = Field(description="Locale of the PLD")
     title: str = Field(description="Main title on document title page", min_length=1)
     subtitle: Optional[str] = Field(None, description="Subtitle on document title page", min_length=1)
     description: Optional[str] = Field(None, description="Description of document", min_length=1)
