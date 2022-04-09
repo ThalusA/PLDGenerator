@@ -1,12 +1,13 @@
-from pylatex.base_classes import Environment
+import datetime
+from hashlib import md5
+from typing import Dict, Tuple, List
+
+from pylatex import Document, Package, Command, NewLine, Center, VerticalSpace, LargeText, Figure, Section, Tabularx, \
+    MultiColumn, NewPage, TikZ, TikZOptions, TikZNode, TikZDraw, TikZPathList, Subsection, MediumText, Subsubsection, \
+    Itemize, MiniPage, Head, Foot, PageStyle, StandAloneGraphic, simple_page_number, UnsafeCommand
 from pylatex.utils import bold, NoEscape
 
 from src.schema import PLDSchema, Version, LocaleDictionary, UserStory
-from typing import Dict, Tuple, List
-import datetime
-from pylatex import Document, Package, Command, NewLine, Center, VerticalSpace, LargeText, Figure, Section, Tabularx, \
-    MultiColumn, NewPage, TikZ, TikZOptions, TikZNode, TikZDraw, TikZPathList, Subsection, MediumText, Subsubsection, \
-    Itemize, MiniPage, Head, Foot, PageStyle, StandAloneGraphic, SmallText, simple_page_number, UnsafeCommand
 
 
 def generate_options(document: Document) -> Document:
@@ -179,7 +180,7 @@ def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: D
                 node_kwargs = {'align': 'center'}
 
                 top_box = TikZNode(text=schema.title,
-                                   handle='box',
+                                   handle=md5(schema.title.encode()).hexdigest(),
                                    options=[TikZOptions('draw',
                                                         'rounded corners',
                                                         **node_kwargs)])
@@ -187,11 +188,13 @@ def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: D
 
                 for deliverable in schema.deliverables:
                     box = TikZNode(text=deliverable.name,
-                                   handle='box',
+                                   handle=md5(deliverable.name.encode()).hexdigest(),
                                    options=[TikZOptions('draw',
                                                         'rounded corners',
                                                         **node_kwargs)])
-                    path = TikZDraw(TikZPathList([top_box.south, box.north]))
+                    path = TikZDraw(TikZPathList(
+                        top_box.get_anchor_point("south"), "to", box.get_anchor_point("north")
+                    ))
                     forest.append(box)
                     forest.append(path)
     return document
@@ -242,15 +245,16 @@ def generate_user_story(user_story: UserStory, locale: LocaleDictionary, subsubs
         tabularx.add_row([MultiColumn(2, align="l", data=[f"{locale.description}: ",
                                                           user_story.description or ""], color="gray")])
         tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.definition_of_done}: ",
-                                                          definitions_of_done])])
+                                                                                  definitions_of_done])])
         tabularx.add_row([MultiColumn(2, align="l", data=[f"{locale.assignation}: ",
                                                           ", ".join(user_story.assignments)], color="gray")])
         tabularx.add_row([f"{locale.estimated_duration}: ",
-                          f"{user_story.estimated_duration} {locale.man_days} ({int(user_story.estimated_duration * 8)} {locale.hours})"])
+                          f"{user_story.estimated_duration} {locale.man_days} ({int(user_story.estimated_duration * 8)}"
+                          f" {locale.hours})"])
         tabularx.add_row([f"{locale.status}: ",
                           user_story.status.translate(locale)])
         tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.comments}: ",
-                                                          comments], color="gray")])
+                                                                                  comments], color="gray")])
     return subsubsection
 
 
@@ -296,6 +300,7 @@ def generate_pld(schema: PLDSchema, locale: LocaleDictionary) -> Document:
     generate_document_description(schema, locale, document)
     generate_document_versions_table(schema, locale, document)
     generate_toc(locale, document)
+    generate_organigram(schema, locale, document)
     generate_deliverables(schema, locale, document)
     generate_user_stories(schema, locale, document)
     generate_work_report_page(schema, locale, document)
