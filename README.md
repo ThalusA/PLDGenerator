@@ -5,8 +5,8 @@ A (super) script to generate EPITECH's EIP Project Log Documents.
 ## Requirements
 
 You need to populate the assets' folder with those files:
-- primary_logo.svg: Your primary logo in the svg format 
-- secondary_logo.svg: Your secondary logo in the svg format 
+- primary_logo.pdf: Your primary logo in the pdf format 
+- secondary_logo.pdf: Your secondary logo in the pdf format 
 - *.json: Your PLD document in the form of a json which follow this schema: <https://raw.githubusercontent.com/ThalusA/PLDGenerator/master/pld_schema.json>
 
 ## Usage
