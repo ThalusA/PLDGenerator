@@ -2,6 +2,7 @@
 import json
 import argparse
 import glob
+import os
 
 from src.generator import generate_pld
 from pathlib import Path
@@ -18,9 +19,9 @@ if __name__ == "__main__":
         with open("locale_schema.json", "w") as file:
             file.write(LocaleDictionary.schema_json(indent=2))
     else:
-        schema_args = json.loads(glob.glob("assets/*.json")[0])
+        schema_args = json.load(open(glob.glob("assets/*.json")[0]))
         schema = PLDSchema(**schema_args)
-        locale_args = json.loads(str(Path("src/locale").joinpath(f"{schema.locale}.json")))
+        locale_args = json.load(open(str(Path("src/locale").joinpath(f"{schema.locale}.json"))))
         locale = LocaleDictionary(**locale_args)
         document = generate_pld(schema, locale)
         tex_filepath = "build/pld.tex"

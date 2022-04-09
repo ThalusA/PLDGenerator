@@ -1,12 +1,12 @@
-from pylatex.base_classes import Environment, Container
-from pylatex.utils import bold
+from pylatex.base_classes import Environment
+from pylatex.utils import bold, NoEscape
 
 from src.schema import PLDSchema, Version, LocaleDictionary, UserStory
 from typing import Dict, Tuple, List
 import datetime
 from pylatex import Document, Package, Command, NewLine, Center, VerticalSpace, LargeText, Figure, Section, Tabularx, \
     MultiColumn, NewPage, TikZ, TikZOptions, TikZNode, TikZDraw, TikZPathList, Subsection, MediumText, Subsubsection, \
-    Itemize, MiniPage
+    Itemize, MiniPage, Head, Foot, PageStyle, StandAloneGraphic, SmallText, simple_page_number, UnsafeCommand
 
 
 class Chunk(Environment):
@@ -17,58 +17,49 @@ def generate_options(document: Document) -> Document:
     document.preamble.append(Command("raggedbottom"))
     document.preamble.append(Command("newlength"))
     document.preamble.append(Command("chunktoheight"))
-    document.preamble.append(Command("NewEnviron", "chunk", "1", extra_arguments=[
-        Command("settototalheight", Command("chunktotheight"), MiniPage().append(Command("BODY"))),
-        Command("ifdim"), Command("chunktoheight>"), Command("textheight"),
-        Command("else"),
-        Command("needspace", Command("chunktoheight")),
-        Command("fi"),
-        Command("def"), Command("temp", "#1"), Command("ifx"), Command("temp"), Command("empty"), Command("else"),
-        Command("addtocounter", "#1", "-1"),
-        Command("fi"),
-        Command("BODY")
+    document.preamble.append(UnsafeCommand("NewEnviron", "chunk", "1", extra_arguments=[
+        UnsafeCommand("settototalheight", Command("chunktotheight"),
+                      extra_arguments=[NoEscape(MiniPage(data=Command("BODY")).dumps())]).dumps() +
+        Command("ifdim").dumps() + Command("chunktoheight>").dumps() + Command("textheight").dumps() +
+        Command("else").dumps() +
+        Command("needspace", Command("chunktoheight")).dumps() +
+        Command("fi").dumps() +
+        Command("def").dumps() + Command("temp", "#1").dumps() + Command("ifx").dumps() + Command(
+            "temp").dumps() + Command("empty").dumps() + Command("else").dumps() +
+        Command("addtocounter", "#1", "-1").dumps() +
+        Command("fi").dumps() +
+        Command("BODY").dumps()
     ]))
-    document.preamble.append(Command("setcounter", "secnumdepth", "0"))
+    document.preamble.append(Command("setcounter", "secnumdepth", extra_arguments="0"))
     return document
 
 
 def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
-    document.preamble.append(Command("newcommand", Command("rowWidth"),
-                                     f"{Command('linewidth')}-({Command('tabcolsep')}*2)"))
-    document.preamble.append(Command("renewcommand", Command("familydefault"), Command("sfdefault")))
-    document.preamble.append(Command("pagestyle", "fancy"))
-    document.preamble.append(Command("renewcommand", Command("headrulewidth"), "0pt"))
-    document.preamble.append(Command("fancyhf", ""))
-    document.preamble.append(Command("svgpath", "assets/"))
-    document.preamble.append(Command("lhead", Command("includesvg", "width = 30pt", "primary_logo.svg")))
-    document.preamble.append(Command("rhead", LargeText(locale.project_log_document)))
-    document.preamble.append(Command("rfoot", [
-        locale.page,
-        Command("thepage"),
-        Command("space"),
-        locale.of,
-        Command("pageref", "LastPage")
-    ]))
-    document.preamble.append(Command("lfoot", Command("includesvg", "width = 100pt", "secondary_logo.svg")))
-    document.preamble.append(Command("fancypagestyle", "plain", [
-        Command("renewcommand", Command("headrulewidth"), "0pt"),
-        Command("fancyhf"),
-        Command("rfoot", [
-            locale.page,
-            Command("thepage"),
-            Command("space"),
-            locale.of,
-            Command("pageref", "LastPage")
-        ]),
-        Command("lfoot", Command("includesvg", "width = 100pt", "secondary_logo.svg"))
-    ]))
-    document.preamble.append(Command("renewcommand*"))
-    document.preamble.append(Command("contentsname", locale.table_of_content))
+    document.preamble.append(UnsafeCommand("newcommand", Command("rowWidth"),
+                                     extra_arguments=NoEscape("\\linewidth-(\\tabcolsep*2)")))
+    document.preamble.append(Command('renewcommand', NoEscape('\\familydefault'), extra_arguments=NoEscape('\\sfdefault')))
+    document.preamble.append(Command("graphicspath", "assets"))
+    header = PageStyle("header")
+    with header.create(Head("L")) as left_header:
+        left_header: Head
+        left_header.create(StandAloneGraphic("primary_logo.svg", NoEscape("width=30pt")))
+    with header.create(Head("R")) as right_header:
+        right_header: Head
+        right_header.append(LargeText(locale.project_log_document))
+    with header.create(Foot("R")) as right_footer:
+        right_footer: Foot
+        right_footer.append(simple_page_number())
+    with header.create(Foot("L")) as left_footer:
+        left_footer: Foot
+        left_footer.create(StandAloneGraphic("secondary_logo.svg", NoEscape("width=100pt")))
+
     document.preamble.append(Command("title", locale.project_log_document))
     now = datetime.date.today()
     document.preamble.append(Command("date", f"{now.day}/{now.month}/{now.year}"))
-    document.preamble.append(Command("author",
-                                     [elem for author in schema.authors for elem in (author, Command("and"))][:-1]))
+    document.preamble.append(Command("author", NoEscape(", ".join(schema.authors))))
+    document.preamble.append(header)
+    document.change_document_style("header")
+
     return document
 
 
@@ -85,20 +76,19 @@ def generate_dependencies(document: Document) -> Document:
 
 
 def generate_first_page(schema: PLDSchema, document: Document) -> Document:
-    with document.create(Container()):
-        document.append(NewPage)
-        document.append(Command("vspace*", Command("fill")))
-        with document.create(Center()):
-            with document.create(Figure(position="htbp")) as plot:
-                plot: Figure
-                plot.add_image("primary_logo.svg")
-                plot.add_caption(str(Command("maketitle")))
-            if schema.subtitle is not None:
-                document.append(VerticalSpace("4cm"))
-                document.append(NewLine)
-                document.append(Command("textbf", LargeText(schema.subtitle)))
-        document.append(Command("vfill"))
-        document.append(NewPage)
+    document.append(NewPage())
+    document.append(Command("vspace*", Command("fill")))
+    with document.create(Center()):
+        with document.create(Figure(position="htbp")) as plot:
+            plot: Figure
+            plot.add_image("primary_logo.svg")
+            plot.append(LargeText(Command("maketitle")))
+        if schema.subtitle is not None:
+            document.append(VerticalSpace("4cm"))
+            document.append(NewLine())
+            document.append(Command("textbf", LargeText(schema.subtitle)))
+    document.append(Command("vfill"))
+    document.append(NewPage())
     return document
 
 
@@ -118,8 +108,8 @@ def generate_work_report_page(schema: PLDSchema, locale: LocaleDictionary, docum
                                 authors_user_stories[saved_author].append(user_story)
                             else:
                                 authors_user_stories[saved_author] = [user_story]
-    document.append(Command("setcounter", "secnumdepth", "0"))
-    document.append(NewPage)
+    document.append(Command("setcounter", "secnumdepth", extra_arguments="0"))
+    document.append(NewPage())
     with document.create(Section(title=locale.advancement_report)) as section:
         section: Section
 
@@ -136,7 +126,7 @@ def generate_work_report_page(schema: PLDSchema, locale: LocaleDictionary, docum
     return document
 
 
-def generate_stats(schema: PLDSchema) -> Tuple[str, dict[str, float]]:
+def generate_stats(schema: PLDSchema) -> Tuple[float, dict[str, float]]:
     authors_score: Dict[str, float] = dict(zip(schema.authors, [float(0.0)] * len(schema.authors)))
     total_score: float = float(0.0)
     for deliverable in schema.deliverables:
@@ -148,7 +138,7 @@ def generate_stats(schema: PLDSchema) -> Tuple[str, dict[str, float]]:
                         if author in saved_author:
                             authors_score[saved_author] += user_story.estimated_duration
                             break
-    return f"{total_score:g}", authors_score
+    return total_score, authors_score
 
 
 def generate_document_description(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
@@ -165,8 +155,8 @@ def generate_document_description(schema: PLDSchema, locale: LocaleDictionary, d
                 tabularx.add_row([MultiColumn(1, data=locale.updated_date, color="gray"), schema.versions[-1].date])
                 tabularx.add_row([MultiColumn(1, data=locale.model_version, color="gray"), schema.versions[-1].version])
                 tabularx.add_row([MultiColumn(2, color="gray", data=bold(locale.stats))])
-                tabularx.add_row([MultiColumn(1, data=locale.man_days_distribution, color="gray"), f"{NewLine} ".join(
-                    [f"{author}: {score:g}" for author, score in man_days_distribution])])
+                tabularx.add_row([MultiColumn(1, data=locale.man_days_distribution, color="gray"), f"{NewLine()} ".join(
+                    [f"{author}: {score:g}" for author, score in man_days_distribution.items()])])
                 tabularx.add_row([MultiColumn(1, data=locale.total_man_days, color="gray"), f"{total_man_days:g}"])
     return document
 
@@ -185,18 +175,17 @@ def generate_document_versions_table(schema: PLDSchema, locale: LocaleDictionary
 
 
 def generate_toc(locale: LocaleDictionary, document: Document) -> Document:
-    document.append(Command("setcounter", "secnumdepth", "50"))
-    document.append(Command("setcounter", "tocdepth", "50"))
-    document.append(Command("renewcommand"))
-    document.append(Command("contentsname", locale.table_of_content))
-    document.append(NewLine)
-    document.append(NewPage)
+    document.append(Command("setcounter", "secnumdepth", extra_arguments="50"))
+    document.append(Command("setcounter", "tocdepth", extra_arguments="50"))
+    document.set_variable("contentsname", locale.table_of_content)
+    document.append(NewLine())
+    document.append(NewPage())
     document.append(Command("tableofcontents"))
     return document
 
 
 def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
-    document.append(NewPage)
+    document.append(NewPage())
     with document.create(Chunk(start_arguments="section")) as chunk:
         chunk: Chunk
         with chunk.create(Section(title=locale.organigram)) as section:
@@ -266,10 +255,10 @@ def generate_user_story(user_story: UserStory, locale: LocaleDictionary, subsubs
         tabularx.add_row([f"{locale.as_user}: ", f"{locale.user_want}: "])
         tabularx.add_row([user_story.user, user_story.action])
         tabularx.add_row([MultiColumn(2, data=[f"{locale.description}: ",
-                                               NewLine,
+                                               NewLine(),
                                                user_story.description or ""], color="gray")])
         tabularx.add_row([MultiColumn(2, data=[f"{locale.definition_of_done}: ",
-                                               NewLine,
+                                               NewLine(),
                                                definitions_of_done])])
         tabularx.add_row([MultiColumn(2, data=[f"{locale.assignation}: ",
                                                ", ".join(user_story.assignments)], color="gray")])
@@ -278,13 +267,13 @@ def generate_user_story(user_story: UserStory, locale: LocaleDictionary, subsubs
         tabularx.add_row([f"{locale.status}: ",
                           str(user_story.status)])
         tabularx.add_row([MultiColumn(2, data=[f"{locale.comments}: ",
-                                               NewLine,
+                                               NewLine(),
                                                comments], color="gray")])
     return subsubsection
 
 
 def generate_user_stories(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
-    document.append(NewPage)
+    document.append(NewPage())
 
     with document.create(Chunk(start_arguments="section")) as chunk:
         chunk: Chunk
@@ -312,8 +301,8 @@ def get_unix_timestamp_from_version(version: Version) -> float:
 
 def generate_pld(schema: PLDSchema, locale: LocaleDictionary) -> Document:
     document = Document(f"PLD {datetime.date.today().year} - {schema.title}",
-                        geometry_options={"a4paper": None, "total": "{170mm,257mm}", "left": "20mm", "top": "20mm"},
-                        documentclass=Command("documentclass", arguments=["extarticle"], options=["12pt"]),
+                        geometry_options={"left": "20mm", "top": "20mm"},
+                        documentclass=Command("documentclass", arguments=["extarticle"], options=["a4paper", "12pt"]),
                         fontenc="T1", inputenc="utf8", page_numbers=True)
     schema.versions = sorted(schema.versions, key=get_unix_timestamp_from_version)
     generate_dependencies(document)
@@ -328,4 +317,3 @@ def generate_pld(schema: PLDSchema, locale: LocaleDictionary) -> Document:
     generate_user_stories(schema, locale, document)
     generate_work_report_page(schema, locale, document)
     return document
-
