@@ -69,17 +69,16 @@ class Status(str, Enum):
             return 0
 
     def translate(self, locale: LocaleDictionary) -> str:
-        if self.name == Status.to_do:
+        if self == Status.to_do:
             return locale.to_do
-        elif self.name == Status.wip:
+        elif self == Status.wip:
             return locale.wip
-        elif self.name == Status.done:
+        elif self == Status.done:
             return locale.done
-        elif self.name == Status.abandoned:
+        elif self == Status.abandoned:
             return locale.abandoned
         else:
             return ""
-
 
 class UserStory(BaseModel):
     type: str = Field("user_story", const=True)

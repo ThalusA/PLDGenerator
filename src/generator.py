@@ -9,40 +9,24 @@ from pylatex import Document, Package, Command, NewLine, Center, VerticalSpace, 
     Itemize, MiniPage, Head, Foot, PageStyle, StandAloneGraphic, SmallText, simple_page_number, UnsafeCommand
 
 
-class Chunk(Environment):
-    pass
-
-
 def generate_options(document: Document) -> Document:
     document.preamble.append(Command("raggedbottom"))
     document.preamble.append(Command("newlength"))
     document.preamble.append(Command("chunktoheight"))
-    document.preamble.append(UnsafeCommand("NewEnviron", "chunk", "1", extra_arguments=[
-        UnsafeCommand("settototalheight", Command("chunktotheight"),
-                      extra_arguments=[NoEscape(MiniPage(data=Command("BODY")).dumps())]).dumps() +
-        Command("ifdim").dumps() + Command("chunktoheight>").dumps() + Command("textheight").dumps() +
-        Command("else").dumps() +
-        Command("needspace", Command("chunktoheight")).dumps() +
-        Command("fi").dumps() +
-        Command("def").dumps() + Command("temp", "#1").dumps() + Command("ifx").dumps() + Command(
-            "temp").dumps() + Command("empty").dumps() + Command("else").dumps() +
-        Command("addtocounter", "#1", "-1").dumps() +
-        Command("fi").dumps() +
-        Command("BODY").dumps()
-    ]))
     document.preamble.append(Command("setcounter", "secnumdepth", extra_arguments="0"))
     return document
 
 
 def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
     document.preamble.append(UnsafeCommand("newcommand", Command("rowWidth"),
-                                     extra_arguments=NoEscape("\\linewidth-(\\tabcolsep*2)")))
-    document.preamble.append(Command('renewcommand', NoEscape('\\familydefault'), extra_arguments=NoEscape('\\sfdefault')))
-    document.preamble.append(Command("graphicspath", "assets"))
+                                           extra_arguments=NoEscape("\\linewidth-(\\tabcolsep*2)")))
+    document.preamble.append(
+        Command('renewcommand', NoEscape('\\familydefault'), extra_arguments=NoEscape('\\sfdefault')))
+    document.preamble.append(Command("graphicspath", NoEscape("{assets/}{../assets/}")))
     header = PageStyle("header")
     with header.create(Head("L")) as left_header:
         left_header: Head
-        left_header.create(StandAloneGraphic("primary_logo.svg", NoEscape("width=30pt")))
+        left_header.create(StandAloneGraphic("primary_logo.pdf", NoEscape("width=30pt")))
     with header.create(Head("R")) as right_header:
         right_header: Head
         right_header.append(LargeText(locale.project_log_document))
@@ -51,7 +35,7 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
         right_footer.append(simple_page_number())
     with header.create(Foot("L")) as left_footer:
         left_footer: Foot
-        left_footer.create(StandAloneGraphic("secondary_logo.svg", NoEscape("width=100pt")))
+        left_footer.create(StandAloneGraphic("secondary_logo.pdf", NoEscape("width=100pt")))
 
     document.preamble.append(Command("title", locale.project_log_document))
     now = datetime.date.today()
@@ -65,12 +49,12 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
 
 def generate_dependencies(document: Document) -> Document:
     dependencies: List[str] = ["svg", "amsmath", "fancyhdr", "hyperref", "tgbonum", "tabularx", "colortbl",
-                               "environ", "calc", "needspace", "tocbibind", "xcolor", "adjustbox", "enumitem"]
-    dependencies_with_options: List[Tuple[str, str]] = [("forest", "linguistics")]
-    for name in dependencies:
-        document.packages.append(Package(name))
+                               "environ", "calc", "needspace", "tocbibind", "adjustbox", "enumitem", "xcolor"]
+    dependencies_with_options: List[Tuple[str, str]] = [("xcolor", "table"), ("forest", "linguistics")]
     for name, options in dependencies_with_options:
         document.packages.append(Package(name, options))
+    for name in dependencies:
+        document.packages.append(Package(name))
     document.packages.append(Command("usetikzlibrary", "fit"))
     return document
 
@@ -78,15 +62,15 @@ def generate_dependencies(document: Document) -> Document:
 def generate_first_page(schema: PLDSchema, document: Document) -> Document:
     document.append(NewPage())
     document.append(Command("vspace*", Command("fill")))
-    with document.create(Center()):
-        with document.create(Figure(position="htbp")) as plot:
+    with document.create(Center()) as logo:
+        logo: Center
+        with logo.create(Figure(position="htbp")) as plot:
             plot: Figure
-            plot.add_image("primary_logo.svg")
-            plot.append(LargeText(Command("maketitle")))
+            plot.add_image("primary_logo.pdf")
+        logo.append(LargeText(Command("maketitle")))
         if schema.subtitle is not None:
-            document.append(VerticalSpace("4cm"))
-            document.append(NewLine())
-            document.append(Command("textbf", LargeText(schema.subtitle)))
+            logo.append(VerticalSpace("4cm"))
+            logo.append(Command("textbf", LargeText(schema.subtitle)))
     document.append(Command("vfill"))
     document.append(NewPage())
     return document
@@ -143,9 +127,9 @@ def generate_stats(schema: PLDSchema) -> Tuple[float, dict[str, float]]:
 
 def generate_document_description(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
     total_man_days, man_days_distribution = generate_stats(schema)
-    with document.create(Chunk()) as chunk:
-        chunk: Chunk
-        with chunk.create(Section(title=locale.document_description)) as section:
+    with document.create(MiniPage()) as minipage:
+        minipage: MiniPage
+        with minipage.create(Section(title=locale.document_description)) as section:
             section: Section
             with section.create(Tabularx(table_spec="|l|X|", row_height=1.4)) as tabularx:
                 tabularx: Tabularx
@@ -177,8 +161,7 @@ def generate_document_versions_table(schema: PLDSchema, locale: LocaleDictionary
 def generate_toc(locale: LocaleDictionary, document: Document) -> Document:
     document.append(Command("setcounter", "secnumdepth", extra_arguments="50"))
     document.append(Command("setcounter", "tocdepth", extra_arguments="50"))
-    document.set_variable("contentsname", locale.table_of_content)
-    document.append(NewLine())
+    document.append(Command('renewcommand', Command("contentsname"), extra_arguments=locale.table_of_content))
     document.append(NewPage())
     document.append(Command("tableofcontents"))
     return document
@@ -186,9 +169,9 @@ def generate_toc(locale: LocaleDictionary, document: Document) -> Document:
 
 def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
     document.append(NewPage())
-    with document.create(Chunk(start_arguments="section")) as chunk:
-        chunk: Chunk
-        with chunk.create(Section(title=locale.organigram)) as section:
+    with document.create(MiniPage()) as minipage:
+        minipage: MiniPage
+        with minipage.create(Section(title=locale.organigram)) as section:
             section: Section
             with section.create(TikZ()) as forest:
                 forest: TikZ
@@ -215,9 +198,9 @@ def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: D
 
 
 def generate_deliverables(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
-    with document.create(Chunk(start_arguments="section")) as chunk:
-        chunk: Chunk
-        with chunk.create(Section(title=locale.deliverable_map)) as section:
+    with document.create(MiniPage()) as minipage:
+        minipage: MiniPage
+        with minipage.create(Section(title=locale.deliverable_map)) as section:
             section: Section
 
             for deliverable in schema.deliverables:
@@ -244,42 +227,41 @@ def generate_deliverables(schema: PLDSchema, locale: LocaleDictionary, document:
 
 def generate_user_story(user_story: UserStory, locale: LocaleDictionary, subsubsection: Subsubsection) -> Subsubsection:
     with subsubsection.create(Tabularx(table_spec="|X|X|", row_height="1.4")) as tabularx:
+        tabularx: Tabularx
+
         definitions_of_done = Itemize()
         for definition_of_done in user_story.definitions_of_done:
             definitions_of_done.add_item(definition_of_done)
         comments = Itemize()
         for comment in user_story.comments:
             comments.add_item(comment)
-        tabularx: Tabularx
+
         tabularx.add_row([MultiColumn(2, data=bold(user_story.name), color="gray")])
         tabularx.add_row([f"{locale.as_user}: ", f"{locale.user_want}: "])
         tabularx.add_row([user_story.user, user_story.action])
-        tabularx.add_row([MultiColumn(2, data=[f"{locale.description}: ",
-                                               NewLine(),
-                                               user_story.description or ""], color="gray")])
-        tabularx.add_row([MultiColumn(2, data=[f"{locale.definition_of_done}: ",
-                                               NewLine(),
-                                               definitions_of_done])])
-        tabularx.add_row([MultiColumn(2, data=[f"{locale.assignation}: ",
-                                               ", ".join(user_story.assignments)], color="gray")])
+        tabularx.add_row([MultiColumn(2, align="l", data=[f"{locale.description}: ",
+                                                          user_story.description or ""], color="gray")])
+        tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.definition_of_done}: ",
+                                                          definitions_of_done])])
+        tabularx.add_row([MultiColumn(2, align="l", data=[f"{locale.assignation}: ",
+                                                          ", ".join(user_story.assignments)], color="gray")])
         tabularx.add_row([f"{locale.estimated_duration}: ",
                           f"{user_story.estimated_duration} {locale.man_days} ({int(user_story.estimated_duration * 8)} {locale.hours})"])
         tabularx.add_row([f"{locale.status}: ",
-                          str(user_story.status)])
-        tabularx.add_row([MultiColumn(2, data=[f"{locale.comments}: ",
-                                               NewLine(),
-                                               comments], color="gray")])
+                          user_story.status.translate(locale)])
+        tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.comments}: ",
+                                                          comments], color="gray")])
     return subsubsection
 
 
 def generate_user_stories(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
     document.append(NewPage())
 
-    with document.create(Chunk(start_arguments="section")) as chunk:
-        chunk: Chunk
+    with document.create(MiniPage()) as minipage:
+        minipage: MiniPage
 
         for deliverable in schema.deliverables:
-            with chunk.create(Section(title=deliverable.name)) as section:
+            with minipage.create(Section(title=deliverable.name)) as section:
                 section: Section
                 if deliverable.description is not None:
                     section.append(MediumText(data=deliverable.description))
@@ -302,7 +284,8 @@ def get_unix_timestamp_from_version(version: Version) -> float:
 def generate_pld(schema: PLDSchema, locale: LocaleDictionary) -> Document:
     document = Document(f"PLD {datetime.date.today().year} - {schema.title}",
                         geometry_options={"left": "20mm", "top": "20mm"},
-                        documentclass=Command("documentclass", arguments=["extarticle"], options=["a4paper", "12pt"]),
+                        documentclass=Command("documentclass", arguments=["extarticle"],
+                                              options=["a4paper", "12pt", "table"]),
                         fontenc="T1", inputenc="utf8", page_numbers=True)
     schema.versions = sorted(schema.versions, key=get_unix_timestamp_from_version)
     generate_dependencies(document)

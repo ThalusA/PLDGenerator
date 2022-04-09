@@ -26,6 +26,10 @@ if __name__ == "__main__":
         document = generate_pld(schema, locale)
         tex_filepath = "build/pld.tex"
         pdf_filepath = "build/pld.pdf"
+        try:
+            os.mkdir("build")
+        except FileExistsError:
+            pass
         document.generate_tex(tex_filepath)
         document.generate_pdf(pdf_filepath, clean_tex=True)
         print(f"LaTeX file saved at ./{tex_filepath}")
