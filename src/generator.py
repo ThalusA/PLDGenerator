@@ -37,8 +37,10 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
     with header.create(Foot("L")) as left_footer:
         left_footer: Foot
         left_footer.create(StandAloneGraphic("secondary_logo.pdf", NoEscape("width=100pt")))
-
-    document.preamble.append(Command("title", locale.project_log_document))
+    document.preamble.append(Command("title",
+                                     NoEscape(StandAloneGraphic("primary_logo.pdf", NoEscape("width=100pt")).dumps() +
+                                              "~\\\\[1cm]\n" +
+                                              locale.project_log_document)))
     now = datetime.date.today()
     document.preamble.append(Command("date", f"{now.day}/{now.month}/{now.year}"))
     document.preamble.append(Command("author", NoEscape(", ".join(schema.authors))))
@@ -56,24 +58,15 @@ def generate_dependencies(document: Document) -> Document:
         document.packages.append(Package(name, options))
     for name in dependencies:
         document.packages.append(Package(name))
-    document.packages.append(Command("usetikzlibrary", "fit"))
+    document.packages.append(Command("usetikzlibrary", "fit,positioning"))
     return document
 
 
 def generate_first_page(schema: PLDSchema, document: Document) -> Document:
-    document.append(NewPage())
-    document.append(Command("vspace*", Command("fill")))
-    with document.create(Center()) as logo:
-        logo: Center
-        with logo.create(Figure(position="htbp")) as plot:
-            plot: Figure
-            plot.add_image("primary_logo.pdf")
-        logo.append(LargeText(Command("maketitle")))
-        if schema.subtitle is not None:
-            logo.append(VerticalSpace("4cm"))
-            logo.append(Command("textbf", LargeText(schema.subtitle)))
-    document.append(Command("vfill"))
-    document.append(NewPage())
+    document.append(LargeText(Command("maketitle")))
+    document.append(VerticalSpace("4cm"))
+    document.append(Command("centering"))
+    document.append(LargeText(bold(schema.subtitle)))
     return document
 
 
@@ -100,6 +93,7 @@ def generate_work_report_page(schema: PLDSchema, locale: LocaleDictionary, docum
 
         for author, user_stories in authors_user_stories.items():
             user_stories = sorted(user_stories, key=get_user_story_priority, reverse=True)
+            print(user_stories)
             with section.create(Subsection(title=author)) as subsection:
                 subsection: Subsection
 
@@ -127,6 +121,7 @@ def generate_stats(schema: PLDSchema) -> Tuple[float, dict[str, float]]:
 
 
 def generate_document_description(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
+    document.append(NewPage())
     total_man_days, man_days_distribution = generate_stats(schema)
     with document.create(MiniPage()) as minipage:
         minipage: MiniPage
@@ -170,33 +165,42 @@ def generate_toc(locale: LocaleDictionary, document: Document) -> Document:
 
 def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
     document.append(NewPage())
-    with document.create(MiniPage()) as minipage:
-        minipage: MiniPage
-        with minipage.create(Section(title=locale.organigram)) as section:
+    with document.create(Figure()) as figure:
+        figure: Figure
+        with figure.create(Section(title=locale.organigram)) as section:
             section: Section
             with section.create(TikZ()) as forest:
                 forest: TikZ
 
-                node_kwargs = {'align': 'center'}
+                node_kwargs = {'align': 'center',
+                               'minimum size': '20pt'}
 
+                # noinspection PyTypeChecker
                 top_box = TikZNode(text=schema.title,
-                                   handle=md5(schema.title.encode()).hexdigest(),
-                                   options=[TikZOptions('draw',
+                                   handle=f"project-box",
+                                   options=TikZOptions('draw',
                                                         'rounded corners',
-                                                        **node_kwargs)])
+                                                        **node_kwargs))
                 forest.append(top_box)
+                last_box_handle = top_box.handle
 
-                for deliverable in schema.deliverables:
-                    box = TikZNode(text=deliverable.name,
-                                   handle=md5(deliverable.name.encode()).hexdigest(),
-                                   options=[TikZOptions('draw',
+                for n_deliverable, deliverable in enumerate(schema.deliverables, start=1):
+                    # noinspection PyTypeChecker
+                    box = TikZNode(text=f"{n_deliverable}. {deliverable.name}",
+                                   handle=f"deliverable-box-{n_deliverable}",
+                                   options=TikZOptions('draw',
                                                         'rounded corners',
-                                                        **node_kwargs)])
+                                                        f'below = of {last_box_handle}',
+                                                        **node_kwargs))
+
+                    last_box_handle = box.handle
+                    # noinspection PyTypeChecker
                     path = TikZDraw(TikZPathList(
-                        top_box.get_anchor_point("south"), "to", box.get_anchor_point("north")
+                        top_box.get_anchor_point("south"), "--", box.get_anchor_point("north")
                     ))
                     forest.append(box)
                     forest.append(path)
+    document.append(VerticalSpace("2cm"))
     return document
 
 
