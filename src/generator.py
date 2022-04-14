@@ -5,6 +5,7 @@ from typing import Dict, Tuple, List
 from pylatex import Document, Package, Command, NewLine, Center, VerticalSpace, LargeText, Figure, Section, Tabularx, \
     MultiColumn, NewPage, TikZ, TikZOptions, TikZNode, TikZDraw, TikZPathList, Subsection, MediumText, Subsubsection, \
     Itemize, MiniPage, Head, Foot, PageStyle, StandAloneGraphic, simple_page_number, UnsafeCommand
+from pylatex.section import Paragraph
 from pylatex.utils import bold, NoEscape
 
 from src.schema import PLDSchema, Version, LocaleDictionary, UserStory
@@ -43,7 +44,7 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
                                               locale.project_log_document)))
     now = datetime.date.today()
     document.preamble.append(Command("date", f"{now.day}/{now.month}/{now.year}"))
-    document.preamble.append(Command("author", NoEscape(", ".join(schema.authors))))
+    document.preamble.append(Command("author", NoEscape("\\and ".join(schema.authors))))
     document.preamble.append(header)
     document.change_document_style("header")
 
@@ -65,8 +66,9 @@ def generate_dependencies(document: Document) -> Document:
 def generate_first_page(schema: PLDSchema, document: Document) -> Document:
     document.append(LargeText(Command("maketitle")))
     document.append(VerticalSpace("4cm"))
-    document.append(Command("centering"))
-    document.append(LargeText(bold(schema.subtitle)))
+    with document.create(Center()) as center:
+        center: Center
+        center.append(LargeText(bold(schema.subtitle)))
     return document
 
 
@@ -93,7 +95,6 @@ def generate_work_report_page(schema: PLDSchema, locale: LocaleDictionary, docum
 
         for author, user_stories in authors_user_stories.items():
             user_stories = sorted(user_stories, key=get_user_story_priority, reverse=True)
-            print(user_stories)
             with section.create(Subsection(title=author)) as subsection:
                 subsection: Subsection
 
@@ -135,8 +136,8 @@ def generate_document_description(schema: PLDSchema, locale: LocaleDictionary, d
                 tabularx.add_row([MultiColumn(1, data=locale.updated_date, color="gray"), schema.versions[-1].date])
                 tabularx.add_row([MultiColumn(1, data=locale.model_version, color="gray"), schema.versions[-1].version])
                 tabularx.add_row([MultiColumn(2, color="gray", data=bold(locale.stats))])
-                tabularx.add_row([MultiColumn(1, data=locale.man_days_distribution, color="gray"), f"{NewLine()} ".join(
-                    [f"{author}: {score:g}" for author, score in man_days_distribution.items()])])
+                tabularx.add_row([MultiColumn(1, data=locale.man_days_distribution, color="gray"), NoEscape(f"{NewLine().dumps()} ".join(
+                    [f"{author}: {score:g}" for author, score in man_days_distribution.items()]))])
                 tabularx.add_row([MultiColumn(1, data=locale.total_man_days, color="gray"), f"{total_man_days:g}"])
     return document
 
@@ -169,37 +170,40 @@ def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: D
         figure: Figure
         with figure.create(Section(title=locale.organigram)) as section:
             section: Section
-            with section.create(TikZ()) as forest:
-                forest: TikZ
+            section.append(Command("centering"))
+            with section.create(Center()) as center:
+                center: Center
+                with center.create(TikZ()) as forest:
+                    forest: TikZ
 
-                node_kwargs = {'align': 'center',
-                               'minimum size': '20pt'}
+                    node_kwargs = {'align': 'center',
+                                   'minimum size': '20pt'}
 
-                # noinspection PyTypeChecker
-                top_box = TikZNode(text=schema.title,
-                                   handle=f"project-box",
-                                   options=TikZOptions('draw',
-                                                        'rounded corners',
-                                                        **node_kwargs))
-                forest.append(top_box)
-                last_box_handle = top_box.handle
-
-                for n_deliverable, deliverable in enumerate(schema.deliverables, start=1):
                     # noinspection PyTypeChecker
-                    box = TikZNode(text=f"{n_deliverable}. {deliverable.name}",
-                                   handle=f"deliverable-box-{n_deliverable}",
-                                   options=TikZOptions('draw',
-                                                        'rounded corners',
-                                                        f'below = of {last_box_handle}',
-                                                        **node_kwargs))
+                    top_box = TikZNode(text=schema.title,
+                                       handle=f"project-box",
+                                       options=TikZOptions('draw',
+                                                            'rounded corners',
+                                                            **node_kwargs))
+                    forest.append(top_box)
+                    last_box_handle = top_box.handle
 
-                    last_box_handle = box.handle
-                    # noinspection PyTypeChecker
-                    path = TikZDraw(TikZPathList(
-                        top_box.get_anchor_point("south"), "--", box.get_anchor_point("north")
-                    ))
-                    forest.append(box)
-                    forest.append(path)
+                    for n_deliverable, deliverable in enumerate(schema.deliverables, start=1):
+                        # noinspection PyTypeChecker
+                        box = TikZNode(text=f"{n_deliverable}. {deliverable.name}",
+                                       handle=f"deliverable-box-{n_deliverable}",
+                                       options=TikZOptions('draw',
+                                                            'rounded corners',
+                                                            f'below = of {last_box_handle}' if top_box.handle == last_box_handle else f'right = of {last_box_handle}',
+                                                            **node_kwargs))
+
+                        last_box_handle = box.handle
+                        # noinspection PyTypeChecker
+                        path = TikZDraw(TikZPathList(
+                            top_box.get_anchor_point("south"), "--", box.get_anchor_point("north")
+                        ))
+                        forest.append(box)
+                        forest.append(path)
     document.append(VerticalSpace("2cm"))
     return document
 
@@ -211,7 +215,7 @@ def generate_deliverables(schema: PLDSchema, locale: LocaleDictionary, document:
             section: Section
 
             for deliverable in schema.deliverables:
-                with section.create(Subsection(title=locale.deliverable_map)) as subsection:
+                with section.create(Subsection(title=deliverable.name)) as subsection:
                     subsection: Subsection
                     subsets_length = len(deliverable.subsets)
                     tabular_length = subsets_length if subsets_length != 0 else 1
@@ -232,8 +236,8 @@ def generate_deliverables(schema: PLDSchema, locale: LocaleDictionary, document:
     return document
 
 
-def generate_user_story(user_story: UserStory, locale: LocaleDictionary, subsubsection: Subsubsection) -> Subsubsection:
-    with subsubsection.create(Tabularx(table_spec="|X|X|", row_height="1.4")) as tabularx:
+def generate_user_story(user_story: UserStory, locale: LocaleDictionary, paragraph: Paragraph) -> Paragraph:
+    with paragraph.create(Tabularx(table_spec="|X|X|", row_height="1.4")) as tabularx:
         tabularx: Tabularx
 
         definitions_of_done = Itemize()
@@ -246,42 +250,47 @@ def generate_user_story(user_story: UserStory, locale: LocaleDictionary, subsubs
         tabularx.add_row([MultiColumn(2, data=bold(user_story.name), color="gray")])
         tabularx.add_row([f"{locale.as_user}: ", f"{locale.user_want}: "])
         tabularx.add_row([user_story.user, user_story.action])
-        tabularx.add_row([MultiColumn(2, align="l", data=[f"{locale.description}: ",
-                                                          user_story.description or ""], color="gray")])
-        tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.definition_of_done}: ",
-                                                                                  definitions_of_done])])
-        tabularx.add_row([MultiColumn(2, align="l", data=[f"{locale.assignation}: ",
-                                                          ", ".join(user_story.assignments)], color="gray")])
+        if user_story.description is not None:
+            tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.description}: ",
+                                                              user_story.description], color="gray")])
+        if len(user_story.definitions_of_done) > 0:
+            tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.definition_of_done}: ",
+                                                                                      definitions_of_done])])
+        if len(user_story.assignments) > 0:
+            tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.assignation}: ",
+                                                              ", ".join(user_story.assignments)], color="gray")])
         tabularx.add_row([f"{locale.estimated_duration}: ",
-                          f"{user_story.estimated_duration} {locale.man_days} ({int(user_story.estimated_duration * 8)}"
+                          f"{user_story.estimated_duration:g} {locale.man_days} ({int(user_story.estimated_duration * 8)}"
                           f" {locale.hours})"])
         tabularx.add_row([f"{locale.status}: ",
                           user_story.status.translate(locale)])
-        tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.comments}: ",
-                                                                                  comments], color="gray")])
-    return subsubsection
+        if len(user_story.comments) > 0:
+            tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.comments}: ",
+                                                                                      comments], color="gray")])
+    return paragraph
 
 
 def generate_user_stories(schema: PLDSchema, locale: LocaleDictionary, document: Document) -> Document:
     document.append(NewPage())
-
-    with document.create(MiniPage()) as minipage:
-        minipage: MiniPage
+    with document.create(Section(title=locale.user_stories)) as section:
+        section: Section
 
         for deliverable in schema.deliverables:
-            with minipage.create(Section(title=deliverable.name)) as section:
-                section: Section
+            with section.create(Subsection(title=deliverable.name)) as subsection:
+                subsection: Subsection
                 if deliverable.description is not None:
-                    section.append(MediumText(data=deliverable.description))
+                    subsection.append(MediumText(data=deliverable.description))
                 for subset in deliverable.subsets:
-                    with section.create(Subsection(title=subset.name)) as subsection:
-                        section: Subsection
+                    with subsection.create(Subsubsection(title=subset.name)) as subsubsection:
+                        subsubsection: Subsubsection
                         if subset.description is not None:
-                            subsection.append(MediumText(data=subset.description))
+                            subsubsection.append(MediumText(data=subset.description))
                         for user_story in subset.user_stories:
-                            with subsection.create(Subsubsection(title=user_story.name)) as subsubsection:
-                                subsubsection: Subsubsection
-                                generate_user_story(user_story, locale, subsubsection)
+                            with subsubsection.create(Paragraph(title=user_story.name)) as paragraph:
+                                paragraph: Paragraph
+                                paragraph.append(Command("mbox", ""))
+                                paragraph.append(NoEscape("\\\\\n"))
+                                generate_user_story(user_story, locale, paragraph)
     return document
 
 
