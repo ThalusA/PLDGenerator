@@ -136,8 +136,9 @@ def generate_document_description(schema: PLDSchema, locale: LocaleDictionary, d
                 tabularx.add_row([MultiColumn(1, data=locale.updated_date, color="gray"), schema.versions[-1].date])
                 tabularx.add_row([MultiColumn(1, data=locale.model_version, color="gray"), schema.versions[-1].version])
                 tabularx.add_row([MultiColumn(2, color="gray", data=bold(locale.stats))])
-                tabularx.add_row([MultiColumn(1, data=locale.man_days_distribution, color="gray"), NoEscape(f"{NewLine().dumps()} ".join(
-                    [f"{author}: {score:g}" for author, score in man_days_distribution.items()]))])
+                tabularx.add_row([MultiColumn(1, data=locale.man_days_distribution, color="gray"),
+                                  NoEscape(f"{NewLine().dumps()} ".join(
+                                      [f"{author}: {score:g}" for author, score in man_days_distribution.items()]))])
                 tabularx.add_row([MultiColumn(1, data=locale.total_man_days, color="gray"), f"{total_man_days:g}"])
     return document
 
@@ -183,8 +184,8 @@ def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: D
                     top_box = TikZNode(text=schema.title,
                                        handle=f"project-box",
                                        options=TikZOptions('draw',
-                                                            'rounded corners',
-                                                            **node_kwargs))
+                                                           'rounded corners',
+                                                           **node_kwargs))
                     forest.append(top_box)
                     last_box_handle = top_box.handle
 
@@ -193,9 +194,9 @@ def generate_organigram(schema: PLDSchema, locale: LocaleDictionary, document: D
                         box = TikZNode(text=f"{n_deliverable}. {deliverable.name}",
                                        handle=f"deliverable-box-{n_deliverable}",
                                        options=TikZOptions('draw',
-                                                            'rounded corners',
-                                                            f'below = of {last_box_handle}' if top_box.handle == last_box_handle else f'right = of {last_box_handle}',
-                                                            **node_kwargs))
+                                                           'rounded corners',
+                                                           f'below = of {last_box_handle}' if top_box.handle == last_box_handle else f'right = of {last_box_handle}',
+                                                           **node_kwargs))
 
                         last_box_handle = box.handle
                         # noinspection PyTypeChecker
@@ -252,13 +253,16 @@ def generate_user_story(user_story: UserStory, locale: LocaleDictionary, paragra
         tabularx.add_row([user_story.user, user_story.action])
         if user_story.description is not None:
             tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.description}: ",
-                                                              user_story.description], color="gray")])
+                                                                                      user_story.description],
+                                          color="gray")])
         if len(user_story.definitions_of_done) > 0:
             tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.definition_of_done}: ",
                                                                                       definitions_of_done])])
         if len(user_story.assignments) > 0:
             tabularx.add_row([MultiColumn(2, align=NoEscape("|p{\\rowWidth}|"), data=[f"{locale.assignation}: ",
-                                                              ", ".join(user_story.assignments)], color="gray")])
+                                                                                      ", ".join(
+                                                                                          user_story.assignments)],
+                                          color="gray")])
         tabularx.add_row([f"{locale.estimated_duration}: ",
                           f"{user_story.estimated_duration:g} {locale.man_days} ({int(user_story.estimated_duration * 8)}"
                           f" {locale.hours})"])
