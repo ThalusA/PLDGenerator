@@ -80,11 +80,10 @@ class Status(str, Enum):
         else:
             return ""
 
+
 class UserStory(BaseModel):
     type: str = Field("user_story", const=True)
-    id: Optional[str] = Field(None)
-    name: str = Field(description="Name of the user story",
-                      min_length=1)
+    name: str = Field(description="Name of the user story", min_length=1)
     user: str = Field(description="User that do the action of user story")
     action: str = Field(description="Action done by the user")
     description: Optional[str] = Field(None, description="Detailed description of the user")
