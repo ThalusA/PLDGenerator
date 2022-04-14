@@ -37,7 +37,7 @@ def generate_style(schema: PLDSchema, locale: LocaleDictionary, document: Docume
         right_footer.append(NoEscape(f"{locale.page} \\thepage\\ {locale.of} \\pageref{{LastPage}}"))
     with header.create(Foot("L")) as left_footer:
         left_footer: Foot
-        left_footer.create(StandAloneGraphic("secondary_logo.pdf", NoEscape("width=100pt")))
+        left_footer.append(StandAloneGraphic("secondary_logo.pdf", NoEscape("width=100pt")))
     document.preamble.append(Command("title",
                                      NoEscape(StandAloneGraphic("primary_logo.pdf", NoEscape("width=100pt")).dumps() +
                                               "~\\\\[1cm]\n" +
