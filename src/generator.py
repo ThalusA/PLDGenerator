@@ -113,10 +113,12 @@ def generate_stats(schema: PLDSchema) -> Tuple[float, dict[str, float]]:
         for subset in deliverable.subsets:
             for user_story in subset.user_stories:
                 total_score += user_story.estimated_duration
+                number_of_assigned_person = len(user_story.assignments)
+                estimated_man_days = user_story.estimated_duration / number_of_assigned_person
                 for author in user_story.assignments:
                     for saved_author in schema.authors:
                         if author in saved_author:
-                            authors_score[saved_author] += user_story.estimated_duration
+                            authors_score[saved_author] += estimated_man_days
                             break
     return total_score, authors_score
 
