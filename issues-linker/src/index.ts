@@ -29,7 +29,7 @@ function bodyFromUserStory(locale: LocaleDictionary, userStory: UserStory): stri
     <tr>
         <td colspan="2">${locale.definition_of_done}:<br>
             <ul>
-                ${userStory.definitions_of_done ? userStory.definitions_of_done.map(definition_of_done => `<li>${definition_of_done}</li>`) : '' }
+                ${userStory.definitions_of_done ? userStory.definitions_of_done.map(definition_of_done => `<li>${definition_of_done}</li>`).join('\n') : '' }
             </ul>
         </td>
     </tr>
@@ -60,7 +60,7 @@ function bodyFromUserStory(locale: LocaleDictionary, userStory: UserStory): stri
     <tr>
         <td colspan="2">${locale.comments}:${userStory.comments instanceof String ? ` ${userStory.comments}` : ''}<br>
             ${userStory.comments instanceof Array ? `<ul>
-                ${userStory.comments.map(comment => `<li>${comment}</li>`)}
+                ${userStory.comments.map(comment => `<li>${comment}</li>`).join('\n')}
             </ul>` : '' }
         </td>
     </tr>
@@ -121,7 +121,7 @@ function bodyFromPLD(locale: LocaleDictionary, pld: PLDSchema): string {
             <td>${version.authors ? version.authors.join(', ') : ''}</td>
             <td>${version.sections}</td>
             <td>${version.comment}</td>
-        </tr>`) : ''}
+        </tr>`).join('\n') : ''}
     </tbody>
 </table>`)
 }
@@ -140,32 +140,112 @@ interface Options {
   repo: string
 }
 
+enum labels {
+  UserStory = 'user-story',
+  Deliverable = 'deliverable',
+  Subset = 'subset',
+  PLD = 'pld',
+}
+
+type Issue = Awaited<ReturnType<Octokit['rest']['issues']['listForRepo']>>['data'][0]
+type CreatedIssue = Awaited<ReturnType<Octokit['rest']['issues']['create']>>['data']
+
+
+interface SubsetTree extends Object {
+  [key: number]: Issue;
+}
+
+interface DeliverableTree extends Object {
+  0?: Issue;
+  [key: number]: SubsetTree | undefined;
+
+}
+
+interface PLDTree extends Object {
+  0?: Issue;
+  [key: number]: DeliverableTree | undefined;
+}
+
+
+program
+  .enablePositionalOptions()
+
 program
   .option('-t, --token <token>', 'GitHub Token')
   .option('-o, --owner <owner>', 'GitHub Owner')
   .option('-r, --repo <repo>', 'GitHub Repo')
   .version('0.0.1')
 
+
 program
   .command('export <filepath>')
   .description('Export PLD as a JSON file to <filepath> from GitHub Issues')
-  .action(async (filepath: string, options: Options) => {})
+  .passThroughOptions()
+  .action(async (filepath: string) => {
+    const options: Options = program.opts()
+
+    const octokit = new Octokit({auth: options.token})
+    const issueIterator = octokit.paginate.iterator(octokit.rest.issues.listForRepo, {
+      owner: options.owner,
+      repo: options.repo,
+      per_page: 100,
+    })
+    const availableIssues: PLDTree = {}
+    for await (const {data: issues} of issueIterator) {
+      for (const issue of issues) {
+        // @ts-ignore
+        if (issue.labels.find(label => label.name === labels.PLD)) {
+          availableIssues[0] = issue
+        // @ts-ignore
+        } else if (issue.labels.find(label => label.name === labels.Deliverable)) {
+          const [deliverable] = issue.title.split(' ')[0].split('.').map(str => Number(str))
+          if (availableIssues[deliverable] === undefined) {
+            availableIssues[deliverable] = {}
+          }
+          // @ts-ignore
+          availableIssues[deliverable][0] = issue
+        // @ts-ignore
+        } else if (issue.labels.find(label => label.name === labels.Subset)) {
+          const [deliverable, subset] = issue.title.split(' ')[0].split('.').map(str => Number(str))
+          if (availableIssues[deliverable] === undefined) {
+            availableIssues[deliverable] = {}
+          }
+          // @ts-ignore
+          if (availableIssues[deliverable][subset] === undefined) {
+            // @ts-ignore
+            availableIssues[deliverable][subset] = {}
+          }
+          // @ts-ignore
+          availableIssues[deliverable][subset][0] = issue
+        // @ts-ignore
+        } else if (issue.labels.find(label => label.name === labels.UserStory)) {
+          const [deliverable, subset, userStory] = issue.title.split(' ')[0].split('.').map(str => Number(str))
+          if (availableIssues[deliverable] === undefined) {
+            availableIssues[deliverable] = {}
+          }
+          // @ts-ignore
+          if (availableIssues[deliverable][subset] === undefined) {
+            // @ts-ignore
+            availableIssues[deliverable][subset] = {}
+          }
+          // @ts-ignore
+          availableIssues[deliverable][subset][userStory] = issue
+        }
+      }
+    }
+  })
 
 program
   .command('import <filepath>')
   .description('Import PLD from a JSON file located at <filepath> to GitHub Issues')
-  .action(async (filepath: string, options: Options) => {
+  .passThroughOptions()
+  .action(async (filepath: string) => {
+    const options: Options = program.opts()
+
     const octokit = new Octokit({auth: options.token})
 
     const pld: PLDSchema = JSON.parse(fs.readFileSync(filepath, 'utf8'))
-    const locale: LocaleDictionary = JSON.parse(fs.readFileSync(`../src/locales/${pld.locale}.json`, 'utf8'))
-
-    enum labels {
-      UserStory = 'user-story',
-      Deliverable = 'deliverable',
-      Subset = 'subset',
-      PLD = 'pld',
-    }
+    const locale: LocaleDictionary = JSON.parse(fs.readFileSync(`../src/locale/${pld.locale}.json`, 'utf8'))
 
     const labelPromises = []
     for (const label of Object.values(labels)) {
@@ -182,8 +262,8 @@ program
 
     await Promise.all(labelPromises)
 
-    const availableIssues: Record<string, Awaited<ReturnType<typeof octokit.rest.issues.list>>['data'][0] | Awaited<ReturnType<typeof octokit.rest.issues.create>>['data']> = {}
-    const issueIterator = octokit.paginate.iterator(octokit.rest.issues.list, {
+    const availableIssues: Record<string, Issue | CreatedIssue> = {}
+    const issueIterator = octokit.paginate.iterator(octokit.rest.issues.listForRepo, {
       owner: options.owner,
       repo: options.repo,
       per_page: 100,
@@ -256,7 +336,7 @@ program
               issue_number: savedSubset.number,
               title: `${deliverableDepth}.${subsetDepth} ${subset.name}`,
               labels: [labels.Subset],
-              body: subset.description ? '# Description\n\n' + subset.description + '\n\n# Linked issues\n' + user_stories.map(userStory => `\n- [${checkIfIssueNumberInBody(userStory.number, savedSubset.body_text) ? 'x' : ' '}] #${userStory.number}`) : undefined,
+              body: subset.description ? '# Description\n\n' + subset.description + '\n\n# Linked issues\n' + user_stories.map(userStory => `\n- [${checkIfIssueNumberInBody(userStory.number, savedSubset.body_text) ? 'x' : ' '}] #${userStory.number}`).join('') : undefined,
             })
 
             subsetDepth += 1
@@ -269,7 +349,7 @@ program
           issue_number: savedDeliverable.number,
           title: `${deliverableDepth} ${deliverable.name}`,
           labels: [labels.Deliverable],
-          body: deliverable.description ? '# Description\n\n' + deliverable.description + '\n\n# Linked issues\n' + subsets.map(subset => `\n- [${checkIfIssueNumberInBody(subset.number, savedDeliverable.body_text) ? 'x' : ' '}] #${subset.number}`) : undefined,
+          body: deliverable.description ? '# Description\n\n' + deliverable.description + '\n\n# Linked issues\n' + subsets.map(subset => `\n- [${checkIfIssueNumberInBody(subset.number, savedDeliverable.body_text) ? 'x' : ' '}] #${subset.number}`).join('') : undefined,
         })
 
         deliverableDepth += 1
@@ -282,7 +362,7 @@ program
       issue_number: savedPLD.number,
       title: `${savedPLD.title}`,
       labels: [labels.PLD],
-      body: pld.description ? '# Description\n\n' + bodyFromPLD(locale, pld) + '\n\n# Linked issues' + deliverables.map(deliverable => `\n- [${checkIfIssueNumberInBody(deliverable.number, savedPLD.body_text) ? 'x' : ' '}] #${deliverable.number}`) : undefined,
+      body: pld.description ? '# Description\n\n' + bodyFromPLD(locale, pld) + '\n\n# Linked issues' + deliverables.map(deliverable => `\n- [${checkIfIssueNumberInBody(deliverable.number, savedPLD.body_text) ? 'x' : ' '}] #${deliverable.number}`).join('') : undefined,
     })
   })
 
