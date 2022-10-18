@@ -6,8 +6,12 @@ from datetime import date as date_type
 
 class LocaleDictionary(BaseModel):
     title: str
+    subtitle: str
     document_description: str
     description: str
+    locale: str
+    due_date: str
+    end_date: str
     authors: str
     updated_date: str
     model_version: str

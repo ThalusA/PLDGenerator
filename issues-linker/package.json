@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "prebuild": "json2ts ../locale_schema.json > src/locale.ts && json2ts ../pld_schema.json > src/pld.ts",
     "build": "tsc -p .",
     "start": "tsc -p . && node dist/index.js"
   },

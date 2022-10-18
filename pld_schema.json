@@ -127,6 +127,7 @@
       "properties": {
         "type": {
           "title": "Type",
+          "default": "user_story",
           "const": "user_story",
           "type": "string"
         },
@@ -224,6 +225,7 @@
       "properties": {
         "type": {
           "title": "Type",
+          "default": "subset",
           "const": "subset",
           "type": "string"
         },
@@ -255,6 +257,7 @@
       "properties": {
         "type": {
           "title": "Type",
+          "default": "deliverable",
           "const": "deliverable",
           "type": "string"
         },

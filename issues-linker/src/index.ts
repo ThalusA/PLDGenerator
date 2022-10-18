@@ -1,19 +1,129 @@
+// noinspection HtmlDeprecatedAttribute
+
 import {Octokit} from 'octokit'
 import * as fs from 'node:fs'
 import {program} from 'commander'
 
 import {PLDSchema, UserStory} from './pld'
+import {LocaleDictionary} from './locale'
 
-function bodyFromUserStory(userStory: UserStory): string {
-  return (`
+function bodyFromUserStory(locale: LocaleDictionary, userStory: UserStory): string {
+  const statusMapper: Record<string, string> = {
+    'To do': locale.to_do,
+    'WIP': locale.wip,
+    'Done': locale.done,
+    'Abandoned': locale.abandoned,
+  }
 
-`)
+  return (`<table>
+    <tr>
+        <td colspan="2" align="center" width="2000x">${userStory.name}</td>
+    </tr>
+    <tr>
+        <td>${locale.as_user}:<br>${userStory.user}</td>
+        <td>${locale.user_want}:<br>${userStory.action}</td>
+    </tr>
+    <tr>
+        <td colspan="2">${locale.description}: ${userStory.description}</td>
+    </tr>
+    <tr>
+        <td colspan="2">${locale.definition_of_done}:<br>
+            <ul>
+                ${userStory.definitions_of_done ? userStory.definitions_of_done.map(definition_of_done => `<li>${definition_of_done}</li>`) : '' }
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">${locale.assignation}: ${userStory.assignments ? userStory.assignments.join(", ") : ''}</td>
+    </tr>
+    <tr>
+        <td>${locale.estimated_duration}:</td>
+        <td>
+            ${userStory.estimated_duration} ${locale.man_days} (${Math.ceil(userStory.estimated_duration * 8)} ${locale.hours})
+        </td>
+    </tr>
+    <tr>
+        <td>
+            ${locale.status}:
+        </td>
+        <td>
+            ${userStory.status ? statusMapper[userStory.status] : ''}
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">${locale.due_date}: ${userStory.due_date}<br>
+    </tr>
+    <tr>
+        <td colspan="2">${locale.end_date}: ${userStory.end_date}<br>
+    </tr>
+    ${userStory.comments && userStory.comments.length > 0 ? `
+    <tr>
+        <td colspan="2">${locale.comments}:${userStory.comments instanceof String ? ` ${userStory.comments}` : ''}<br>
+            ${userStory.comments instanceof Array ? `<ul>
+                ${userStory.comments.map(comment => `<li>${comment}</li>`)}
+            </ul>` : '' }
+        </td>
+    </tr>
+    ` : '' }
+</table>`)
 }
 
-function bodyFromPLD(pld: PLDSchema): string {
-  return (`
+function bodyFromPLD(locale: LocaleDictionary, pld: PLDSchema): string {
+  return (`# ${locale.document_description}
 
-`)
+<table>
+    <tr>
+        <th>${locale.title}</th>
+        <td>${pld.title}</td>
+    </tr>
+    <tr>
+        <th>${locale.subtitle}</th>
+        <td>${pld.subtitle ?? ''}</td>
+    </tr>
+    <tr>
+        <th>${locale.description}</th>
+        <td>${pld.description ?? ''}</td>
+    </tr>
+    <tr>
+        <th>${locale.locale}</th>
+        <td>${pld.locale}</td>
+    </tr>
+    <tr>
+        <th>${locale.authors}</th>
+        <td>${pld.authors ? pld.authors.join(', ') : ''}</td>
+    </tr>
+    <tr>
+        <th>${locale.updated_date}</th>
+        <td>${pld.versions ? (pld.versions.at(-1)?.date ?? '') : ''}</td>
+    </tr>
+    <tr>
+        <th>${locale.model_version}</th>
+        <td>${pld.versions ? (pld.versions.at(-1)?.version ?? '') : ''}</td>
+    </tr>
+</table>
+
+# ${locale.revision_table}
+
+<table>
+    <thead>
+        <tr>
+            <th>${locale.date}</th>
+            <th>${locale.version}</th>
+            <th>${locale.authors}</th>
+            <th>${locale.sections}</th>
+            <th>${locale.comment}</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${pld.versions ? pld.versions.map(version => `<tr>
+            <td>${version.date}</td>
+            <td>${version.version}</td>
+            <td>${version.authors ? version.authors.join(', ') : ''}</td>
+            <td>${version.sections}</td>
+            <td>${version.comment}</td>
+        </tr>`) : ''}
+    </tbody>
+</table>`)
 }
 
 function checkIfIssueNumberInBody(issueNumber: number, body?: string): boolean {
@@ -48,6 +158,7 @@ program
     const octokit = new Octokit({auth: options.token})
 
     const pld: PLDSchema = JSON.parse(fs.readFileSync(filepath, 'utf8'))
+    const locale: LocaleDictionary = JSON.parse(fs.readFileSync(`../src/locales/${pld.locale}.json`, 'utf8'))
 
     enum labels {
       UserStory = 'user-story',
@@ -88,7 +199,7 @@ program
       repo: options.repo,
       title: pld.title,
       labels: [labels.PLD],
-      body: bodyFromPLD(pld),
+      body: bodyFromPLD(locale, pld),
     }).then(response => response.data)
     const deliverables = []
     if (pld.deliverables) {
@@ -124,7 +235,7 @@ program
                   repo: options.repo,
                   title: `${deliverableDepth}.${subsetDepth}.${userStoryDepth} ${userStory.name}`,
                   labels: [labels.UserStory],
-                  body: bodyFromUserStory(userStory),
+                  body: bodyFromUserStory(locale, userStory),
                 }).then(response => response.data)
                 user_stories.push(savedUserStory)
                 await octokit.rest.issues.update({
@@ -133,7 +244,7 @@ program
                   issue_number: savedUserStory.number,
                   title: `${deliverableDepth}.${subsetDepth}.${userStoryDepth} ${userStory.name}`,
                   labels: [labels.UserStory],
-                  body: bodyFromUserStory(userStory),
+                  body: bodyFromUserStory(locale, userStory),
                 })
                 userStoryDepth += 1
               }
@@ -145,7 +256,7 @@ program
               issue_number: savedSubset.number,
               title: `${deliverableDepth}.${subsetDepth} ${subset.name}`,
               labels: [labels.Subset],
-              body: subset.description ? subset.description + user_stories.map(userStory => `\n- [${checkIfIssueNumberInBody(userStory.number, savedSubset.body_text) ? 'x' : ' '}] #${userStory.number}`) : undefined,
+              body: subset.description ? '# Description\n\n' + subset.description + '\n\n# Linked issues\n' + user_stories.map(userStory => `\n- [${checkIfIssueNumberInBody(userStory.number, savedSubset.body_text) ? 'x' : ' '}] #${userStory.number}`) : undefined,
             })
 
             subsetDepth += 1
@@ -158,7 +269,7 @@ program
           issue_number: savedDeliverable.number,
           title: `${deliverableDepth} ${deliverable.name}`,
           labels: [labels.Deliverable],
-          body: deliverable.description ? deliverable.description + subsets.map(subset => `\n- [${checkIfIssueNumberInBody(subset.number, savedDeliverable.body_text) ? 'x' : ' '}] #${subset.number}`) : undefined,
+          body: deliverable.description ? '# Description\n\n' + deliverable.description + '\n\n# Linked issues\n' + subsets.map(subset => `\n- [${checkIfIssueNumberInBody(subset.number, savedDeliverable.body_text) ? 'x' : ' '}] #${subset.number}`) : undefined,
         })
 
         deliverableDepth += 1
@@ -171,7 +282,7 @@ program
       issue_number: savedPLD.number,
       title: `${savedPLD.title}`,
       labels: [labels.PLD],
-      body: pld.description ? bodyFromPLD(pld) + deliverables.map(deliverable => `\n- [${checkIfIssueNumberInBody(deliverable.number, savedPLD.body_text) ? 'x' : ' '}] #${deliverable.number}`) : undefined,
+      body: pld.description ? '# Description\n\n' + bodyFromPLD(locale, pld) + '\n\n# Linked issues' + deliverables.map(deliverable => `\n- [${checkIfIssueNumberInBody(deliverable.number, savedPLD.body_text) ? 'x' : ' '}] #${deliverable.number}`) : undefined,
     })
   })
 

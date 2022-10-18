@@ -6,12 +6,28 @@
       "title": "Title",
       "type": "string"
     },
+    "subtitle": {
+      "title": "Subtitle",
+      "type": "string"
+    },
     "document_description": {
       "title": "Document Description",
       "type": "string"
     },
     "description": {
       "title": "Description",
+      "type": "string"
+    },
+    "locale": {
+      "title": "Locale",
+      "type": "string"
+    },
+    "due_date": {
+      "title": "Due Date",
+      "type": "string"
+    },
+    "end_date": {
+      "title": "End Date",
       "type": "string"
     },
     "authors": {
@@ -145,8 +161,12 @@
   },
   "required": [
     "title",
+    "subtitle",
     "document_description",
     "description",
+    "locale",
+    "due_date",
+    "end_date",
     "authors",
     "updated_date",
     "model_version",
