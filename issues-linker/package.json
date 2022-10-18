@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "tsc -p . && node dist/index.js"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "commander": "^9.4.1",
+    "octokit": "^2.0.9"
+  }
+}
