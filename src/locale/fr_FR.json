@@ -1,7 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/ThalusA/PLDGenerator/master/locale_schema.json",
   "title": "Titre",
+  "subtitle": "Sous-titre",
+  "locale": "Localisation",
   "document_description": "Description du document",
+  "due_date": "Date d'échéance",
+  "end_date": "Date de fin",
   "description": "Description",
   "authors": "Auteurs",
   "updated_date": "Mise à jour",

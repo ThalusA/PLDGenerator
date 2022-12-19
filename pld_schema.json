@@ -3,35 +3,35 @@
   "type": "object",
   "properties": {
     "locale": {
+      "title": "Locale",
       "description": "Locale of the PLD",
-      "allOf": [
+      "anyOf": [
         {
           "$ref": "#/definitions/Locale"
+        },
+        {
+          "type": "string"
         }
       ]
     },
     "title": {
       "title": "Title",
       "description": "Main title on document title page",
-      "minLength": 1,
       "type": "string"
     },
     "subtitle": {
       "title": "Subtitle",
       "description": "Subtitle on document title page",
-      "minLength": 1,
       "type": "string"
     },
     "description": {
       "title": "Description",
       "description": "Description of document",
-      "minLength": 1,
       "type": "string"
     },
     "authors": {
       "title": "Authors",
       "description": "List of document authors",
-      "minItems": 1,
       "type": "array",
       "items": {
         "type": "string"
@@ -84,7 +84,6 @@
         "authors": {
           "title": "Authors",
           "description": "Authors of this version",
-          "minItems": 1,
           "type": "array",
           "items": {
             "type": "string"
@@ -93,13 +92,11 @@
         "sections": {
           "title": "Sections",
           "description": "Which sections have been modified",
-          "minLength": 1,
           "type": "string"
         },
         "comment": {
           "title": "Comment",
           "description": "Comment about this version",
-          "minLength": 1,
           "type": "string"
         }
       },
@@ -127,13 +124,13 @@
       "properties": {
         "type": {
           "title": "Type",
+          "default": "user_story",
           "const": "user_story",
           "type": "string"
         },
         "name": {
           "title": "Name",
           "description": "Name of the user story",
-          "minLength": 1,
           "type": "string"
         },
         "user": {
@@ -154,7 +151,6 @@
         "definitions_of_done": {
           "title": "Definitions Of Done",
           "description": "List of definition of done (list of goal) that must be done to complete the user story",
-          "minItems": 1,
           "type": "array",
           "items": {
             "type": "string"
@@ -224,12 +220,12 @@
       "properties": {
         "type": {
           "title": "Type",
+          "default": "subset",
           "const": "subset",
           "type": "string"
         },
         "name": {
           "title": "Name",
-          "minLength": 1,
           "type": "string"
         },
         "description": {
@@ -238,7 +234,6 @@
         },
         "user_stories": {
           "title": "User Stories",
-          "minItems": 1,
           "type": "array",
           "items": {
             "$ref": "#/definitions/UserStory"
@@ -255,12 +250,12 @@
       "properties": {
         "type": {
           "title": "Type",
+          "default": "deliverable",
           "const": "deliverable",
           "type": "string"
         },
         "name": {
           "title": "Name",
-          "minLength": 1,
           "type": "string"
         },
         "description": {
@@ -270,7 +265,6 @@
         "subsets": {
           "title": "Subsets",
           "description": "Subset that groups many user story",
-          "minItems": 1,
           "type": "array",
           "items": {
             "$ref": "#/definitions/Subset"
