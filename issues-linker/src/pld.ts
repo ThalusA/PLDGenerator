@@ -6,9 +6,13 @@
  */
 
 /**
+ * Locale of the PLD
+ */
+export type Locale = Locale1 | string;
+/**
  * An enumeration.
  */
-export type Locale = "fr_FR";
+export type Locale1 = "fr_FR";
 /**
  * Main title on document title page
  */
@@ -23,10 +27,8 @@ export type Subtitle = string;
 export type Description = string;
 /**
  * List of document authors
- *
- * @minItems 1
  */
-export type Authors = [string, ...string[]];
+export type Authors = string[];
 export type Version1 = string;
 /**
  * Release date of this version
@@ -34,10 +36,8 @@ export type Version1 = string;
 export type Date = string;
 /**
  * Authors of this version
- *
- * @minItems 1
  */
-export type Authors1 = [string, ...string[]];
+export type Authors1 = string[];
 /**
  * Which sections have been modified
  */
@@ -50,19 +50,9 @@ export type Versions = Version[];
 export type Type = "deliverable";
 export type Name = string;
 export type Description1 = string;
-/**
- * Subset that groups many user story
- *
- * @minItems 1
- */
-export type Subsets = [Subset, ...Subset[]];
 export type Type1 = "subset";
 export type Name1 = string;
 export type Description2 = string;
-/**
- * @minItems 1
- */
-export type UserStories = [UserStory, ...UserStory[]];
 export type Type2 = "user_story";
 /**
  * Name of the user story
@@ -82,10 +72,8 @@ export type Action = string;
 export type Description3 = string;
 /**
  * List of definition of done (list of goal) that must be done to complete the user story
- *
- * @minItems 1
  */
-export type DefinitionsOfDone = [string, ...string[]];
+export type DefinitionsOfDone = string[];
 /**
  * Number of estimated man day (8 hours)
  */
@@ -110,15 +98,17 @@ export type Assignments = string[];
  * Comment about the user story
  */
 export type Comments = string[] | string;
+export type UserStories = UserStory[];
+/**
+ * Subset that groups many user story
+ */
+export type Subsets = Subset[];
 /**
  * Project deliverable
  */
 export type Deliverables = Deliverable[];
 
 export interface PLDSchema {
-  /**
-   * Locale of the PLD
-   */
   locale: Locale;
   title: Title;
   subtitle?: Subtitle;

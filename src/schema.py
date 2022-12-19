@@ -49,9 +49,9 @@ class LocaleDictionary(BaseModel):
 class Version(BaseModel):
     version: str = Field(regex=r"^\d+\.\d+\.\d+$")
     date: date_type = Field(description="Release date of this version")
-    authors: List[str] = Field(default_factory=list, description="Authors of this version", min_items=1)
-    sections: str = Field(description="Which sections have been modified", min_length=1)
-    comment: str = Field(description="Comment about this version", min_length=1)
+    authors: List[str] = Field(default_factory=list, description="Authors of this version")
+    sections: str = Field(description="Which sections have been modified")
+    comment: str = Field(description="Comment about this version")
 
 
 class Status(str, Enum):
@@ -87,11 +87,11 @@ class Status(str, Enum):
 
 class UserStory(BaseModel):
     type: str = Field("user_story", const=True)
-    name: str = Field(description="Name of the user story", min_length=1)
+    name: str = Field(description="Name of the user story")
     user: str = Field(description="User that do the action of user story")
     action: str = Field(description="Action done by the user")
     description: Optional[str] = Field(None, description="Detailed description of the user")
-    definitions_of_done: List[str] = Field(default_factory=list, min_items=1,
+    definitions_of_done: List[str] = Field(default_factory=list,
                                            description="List of definition of done (list of goal) that must be done to "
                                                        "complete the user story")
     estimated_duration: float = Field(description="Number of estimated man day (8 hours)",
@@ -106,17 +106,16 @@ class UserStory(BaseModel):
 
 class Subset(BaseModel):
     type: str = Field("subset", const=True)
-    name: str = Field(min_length=1)
+    name: str = Field()
     description: Optional[str] = Field(None)
-    user_stories: List[UserStory] = Field(default_factory=list, min_items=1)
+    user_stories: List[UserStory] = Field(default_factory=list)
 
 
 class Deliverable(BaseModel):
     type: str = Field("deliverable", const=True)
-    name: str = Field(min_length=1)
+    name: str = Field()
     description: Optional[str] = Field(None)
-    subsets: List[Subset] = Field(default_factory=list, description="Subset that groups many user story",
-                                  min_items=1)
+    subsets: List[Subset] = Field(default_factory=list, description="Subset that groups many user story")
 
 
 class Locale(str, Enum):
@@ -124,10 +123,10 @@ class Locale(str, Enum):
 
 
 class PLDSchema(BaseModel):
-    locale: Locale = Field(description="Locale of the PLD")
-    title: str = Field(description="Main title on document title page", min_length=1)
-    subtitle: Optional[str] = Field(None, description="Subtitle on document title page", min_length=1)
-    description: Optional[str] = Field(None, description="Description of document", min_length=1)
-    authors: List[str] = Field(default_factory=list, description="List of document authors", min_items=1)
+    locale: Union[Locale, str] = Field(description="Locale of the PLD")
+    title: str = Field(description="Main title on document title page")
+    subtitle: Optional[str] = Field(None, description="Subtitle on document title page")
+    description: Optional[str] = Field(None, description="Description of document")
+    authors: List[str] = Field(default_factory=list, description="List of document authors")
     versions: List[Version] = Field(default_factory=list)
     deliverables: List[Deliverable] = Field(default_factory=list, description="Project deliverable")
