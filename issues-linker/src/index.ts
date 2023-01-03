@@ -7,16 +7,14 @@ import {LocaleDictionary} from './locale'
 import {bodyFromPLD, bodyFromDeliverable, bodyFromSubset, bodyFromUserStory, pldFromBody} from './transformer'
 import {CreatedIssue, Issue, Labels, Options, PLDTree} from './types'
 
-
 program
   .enablePositionalOptions()
 
 program
-  .option('-t, --token <token>', 'GitHub Token')
-  .option('-o, --owner <owner>', 'GitHub Owner')
-  .option('-r, --repo <repo>', 'GitHub Repo')
-  .version('0.0.1')
-
+  .requiredOption('-t, --token <token>', 'GitHub Token')
+  .requiredOption('-o, --owner <owner>', 'GitHub Owner')
+  .requiredOption('-r, --repo <repo>', 'GitHub Repo')
+  .version('0.1.0')
 
 program
   .command('export <filepath>')
@@ -123,12 +121,11 @@ program
     }).then(response => response.data)
     const deliverables: Array<Issue & CreatedIssue> = []
     if (pld.deliverables) {
-      let deliverableDepth = 1
       for (const deliverable of pld.deliverables) {
-        const savedDeliverable = availableIssues[`${deliverableDepth}`] ?? await octokit.rest.issues.create({
+        const savedDeliverable = availableIssues[`${deliverables.length + 1}`] ?? await octokit.rest.issues.create({
           owner: options.owner,
           repo: options.repo,
-          title: `${deliverableDepth} ${deliverable.name}`,
+          title: `${deliverables.length + 1} ${deliverable.name}`,
           labels: [Labels.Deliverable],
           body: bodyFromDeliverable(locale, deliverable),
         }).then(response => response.data)
@@ -136,37 +133,26 @@ program
         const subsets: Array<Issue & CreatedIssue> = []
 
         if (deliverable.subsets) {
-          let subsetDepth = 1
           for (const subset of deliverable.subsets) {
-            const savedSubset = availableIssues[`${deliverableDepth}.${subsetDepth}`] ?? await octokit.rest.issues.create({
+            const savedSubset = availableIssues[`${deliverables.length + 1}.${subsets.length + 1}`] ?? await octokit.rest.issues.create({
               owner: options.owner,
               repo: options.repo,
-              title: `${deliverableDepth}.${subsetDepth} ${subset.name}`,
+              title: `${deliverables.length + 1}.${subsets.length + 1} ${subset.name}`,
               labels: [Labels.Subset],
               body: subset.description,
             }).then(response => response.data)
             subsets.push(savedSubset)
             const userStories: Array<Issue & CreatedIssue> = []
             if (subset.user_stories) {
-              let userStoryDepth = 1
               for (const userStory of subset.user_stories) {
-                const savedUserStory = availableIssues[`${deliverableDepth}.${subsetDepth}.${userStoryDepth}`] ?? await octokit.rest.issues.create({
+                const savedUserStory = availableIssues[`${deliverables.length + 1}.${subsets.length + 1}.${userStories.length + 1}`] ?? await octokit.rest.issues.create({
                   owner: options.owner,
                   repo: options.repo,
-                  title: `${deliverableDepth}.${subsetDepth}.${userStoryDepth} ${userStory.name}`,
+                  title: `${deliverables.length + 1}.${subsets.length + 1}.${userStories.length + 1} ${userStory.name}`,
                   labels: [Labels.UserStory],
                   body: bodyFromUserStory(locale, userStory),
                 }).then(response => response.data)
                 userStories.push(savedUserStory)
-                await octokit.rest.issues.update({
-                  owner: options.owner,
-                  repo: options.repo,
-                  issue_number: savedUserStory.number,
-                  title: `${deliverableDepth}.${subsetDepth}.${userStoryDepth} ${userStory.name}`,
-                  labels: [Labels.UserStory],
-                  body: bodyFromUserStory(locale, userStory),
-                })
-                userStoryDepth += 1
               }
             }
 
@@ -174,12 +160,10 @@ program
               owner: options.owner,
               repo: options.repo,
               issue_number: savedSubset.number,
-              title: `${deliverableDepth}.${subsetDepth} ${subset.name}`,
+              title: `${deliverables.length + 1}.${subsets.length + 1} ${subset.name}`,
               labels: [Labels.Subset],
               body: bodyFromSubset(locale, subset, savedSubset, userStories),
             })
-
-            subsetDepth += 1
           }
         }
 
@@ -187,12 +171,10 @@ program
           owner: options.owner,
           repo: options.repo,
           issue_number: savedDeliverable.number,
-          title: `${deliverableDepth} ${deliverable.name}`,
+          title: `${deliverables.length + 1} ${deliverable.name}`,
           labels: [Labels.Deliverable],
           body: bodyFromDeliverable(locale, deliverable, savedDeliverable, subsets),
         })
-
-        deliverableDepth += 1
       }
     }
 
