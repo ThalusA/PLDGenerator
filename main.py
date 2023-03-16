@@ -21,7 +21,7 @@ if __name__ == "__main__":
     else:
         schema_args = json.load(open(glob.glob("assets/*.json")[0]))
         schema = PLDSchema(**schema_args)
-        locale_args = json.load(open(str(Path("src/locale").joinpath(f"{schema.locale}.json"))))
+        locale_args = json.load(open(str(Path("src/locale").joinpath(f"{schema.locale.value}.json"))))
         locale = LocaleDictionary(**locale_args)
         document = generate_pld(schema, locale)
         tex_filepath = "build/pld.tex"
