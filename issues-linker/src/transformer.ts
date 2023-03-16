@@ -88,6 +88,9 @@ export function userStoryFromBody(locale: LocaleDictionary, object: Issue): User
   const groups = (object.body ?? '').match(regexp)?.groups
 
   if (groups === undefined) {
+    console.log("\n\n\n")
+    console.log("ERROR: Please check that the following github issue is in the correct format: " + object.url.replace("api.github.com/repos", "github.com"))
+    console.log("\n\n\n")
     throw new Error("Didn't find any groups for this regex")
   }
 
