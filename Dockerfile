@@ -1,4 +1,4 @@
-FROM python:slim
+FROM python:3.9-bullseye
 
 RUN apt-get update -y && apt-get install -y inkscape latexmk texlive texlive-latex-extra
 
